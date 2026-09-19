@@ -57,6 +57,10 @@ export default async function GasolineraPage() {
     if(!gasolineraActual["Horario"] && gasolinera["Horario"] != ""){
       gasolineraActual["Horario"] = gasolinera["Horario"];
     }
+    if(!gasolineraActual["Maps"]){
+      gasolineraActual["Maps"] = getGoogleMapsUrl(gasolinera["Rótulo"], gasolinera["Dirección"], gasolinera["Localidad"]);
+    }
+
     if(!gasolineraActual["Precios"]){
       gasolineraActual["Precios"] = {};
     }
@@ -151,7 +155,7 @@ export default async function GasolineraPage() {
                 <div className="min-w-0">
                   <div className="flex items-start justify-between max-w-full">
                       <h2 className="text-lg font-bold text-slate-900 leading-tight">{g["Rótulo"]}</h2>
-                      <a style={{ color: g["Color"] }} href={getGoogleMapsUrl(g["Rótulo"], g["Dirección"], g["Localidad"])} target="_blank" rel="noopener noreferrer">
+                      <a style={{ color: g["Color"] }} href={g["Maps"]} target="_blank" rel="noopener noreferrer">
                         Maps
                       </a>
                   </div>
