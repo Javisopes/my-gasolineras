@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --color-primary: #FF7A00;
 }
 
 @theme inline {
@@ -24,3 +25,48 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.first-color{
+  background-color: var(--color-primary);
+}
+
+.secondary-color{
+  background-color: #00A896;
+}
+
+.bg-color{
+  background-color: #E5E7EB;
+}
+
+.bg-color-2{
+  background-color: #1F2937;
+}
+
+.texto-color{
+  color:#141210;
+}
+
+.border-first-color{
+  border-color: var(--color-primary);
+}
+
+.bg-color-menu:hover {
+  color: var(--color-primary);
+}
+
+/*.first-color{
+  background-color: #F2542D;
+}
+
+.secondary-color{
+  background-color: #1D7A7A;
+}
+
+.bg-color{
+  background-color: #FBEFE4;
+}
+
+.bg-color-2{
+  background-color: #242019;
+}*/
+
