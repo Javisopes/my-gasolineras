@@ -35,6 +35,9 @@ export interface Gasolinera {
   "Precio Hidrogeno"?: string;
   "Precio Metanol"?: string;
   "Precios"?: any;
+  "Color"?: any;
+  "Inicial"?: any;
+  "Maps"?: any;
 }
 
 export interface RespuestaGasolineras {
@@ -42,4 +45,11 @@ export interface RespuestaGasolineras {
   ListaEESSPrecio: Gasolinera[];
   Nota: string;
   ResultQuery: string;
+}
+
+export interface Provincia {
+  CCAA: string;
+  IDCCAA: string;
+  IDPovincia: string;
+  Provincia: string;
 }
