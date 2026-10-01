@@ -53,3 +53,14 @@ export interface Provincia {
   IDPovincia: string;
   Provincia: string;
 }
+
+
+export interface Municipio {
+
+  CCAA: string;
+  IDCCAA: string;
+  IDMunicipio:string;
+  IDProvincia: string;
+  Municipio: string;
+  Provincia: string;
+}
