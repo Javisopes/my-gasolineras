@@ -2,20 +2,20 @@
 import { getProvincias, getMunicipiosPorProvincia } from '@/app/api/routes';
 import { cargarGasolinerasPorProvincia, cargarGasolinerasPorMunicipio } from '@/app/services/gasolineraService';
 import { Gasolinera, Municipio, Provincia } from '@/types/gasolineras';
+import {cargarMunicipios} from '@/app/services/municipioService';
 import React from 'react';
 import { useEffect, useState } from "react";
 
 export default function GasolineraPage() {
 
+  const [provincias, setProvincias] = useState<Provincia[]>([]); // esto también cambia, ver abajo
   const [provinciaId, setProvinciaId] = useState("");
-  const [provinciaNombre, setProvinciaNombre] = useState("");
   const [arrayGasolineras, setGasolineras] = useState<Gasolinera[]>([]);
   const [municipioId, setMunicipioId] = useState("");
   const [municipioNombre, setMunicipioNombre] = useState("");
   const [arrayMunicipios, setMunicipios] = useState<Municipio[]>([]); 
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [provincias, setProvincias] = useState<Provincia[]>([]); // esto también cambia, ver abajo
 
     useEffect(() => {
       getProvincias().then(setProvincias);
@@ -29,16 +29,32 @@ export default function GasolineraPage() {
 
       const controller = new AbortController();
       setError(null);
+        
+      cargarMunicipiosYGasolineras();
 
-      async function cargarTodo() {
-        var gasolinerasFiltradas = await cargarGasolinerasProvincia(provinciaId, controller.signal);
-        console.log(gasolinerasFiltradas);
-        if (gasolinerasFiltradas) {
-          cargarMunicipios(provinciaId, gasolinerasFiltradas, controller.signal);
+      async function cargarMunicipiosYGasolineras() {
+
+        try {
+          setCargando(true);
+
+          var gasolinerasFiltradas = await cargarGasolinerasPorProvincia(provinciaId, controller.signal)
+          if(!gasolinerasFiltradas){
+            setError('No se encontraron gasolineras');
+          }
+          setGasolineras(gasolinerasFiltradas);
+
+          var municipios = await cargarMunicipios(provinciaId, gasolinerasFiltradas, controller.signal);
+          if(!municipios){
+            setError('No se encontraron municipios');
+          }
+          setMunicipios(municipios);
+
+          setCargando(false);
+
+        } catch (e) {
+          if ((e as Error).name !== "AbortError") setError("Error durante la carga de datos");
         }
       }
-      
-      cargarTodo();
 
       return () => controller.abort();
 
@@ -53,58 +69,31 @@ export default function GasolineraPage() {
       const controller = new AbortController();
       setError(null);
       console.log(municipioId);
-      cargarGasolinerasMunicipio(municipioId, controller.signal);
+
+
+
+      cargarGasolinerasDeMunicipio();
+
+      async function cargarGasolinerasDeMunicipio() {
+        try{
+          setCargando(true);
+
+          var arrayGasolineras = await cargarGasolinerasPorMunicipio(municipioId, controller.signal); 
+          if(!arrayGasolineras){
+            setError('No se encontraron gasolineras');
+          }
+          setGasolineras(arrayGasolineras);
+
+          setCargando(false);
+
+        } catch (e) {
+          if ((e as Error).name !== "AbortError") setError("Error durante la carga de datos");
+        }
+      }
 
       return () => controller.abort();
 
     }, [municipioId]);
-
-    async function cargarMunicipios(provinciaId: string, gasolineras: Gasolinera[], signal?: AbortSignal){
-
-      const municipiosConGasolinera = new Set(
-        gasolineras.map(g => g.IDMunicipio)
-      );
-
-      var municipios = await getMunicipiosPorProvincia(provinciaId);
-
-      try {
-        const arrayMunicipios = municipios.filter(m => municipiosConGasolinera.has(m.IDMunicipio));
-
-        setMunicipios(arrayMunicipios);
-      } catch (e) {
-        if ((e as Error).name !== "AbortError") setError("Error al cargar municipios");
-      }
-    }
-
-    async function cargarGasolinerasProvincia(provinciaId: string, signal?: AbortSignal): Promise<Gasolinera[]> {
-      setCargando(true);
-      try {
-
-        var arrayGasolineras = await cargarGasolinerasPorProvincia(provinciaId, signal)
-
-        setGasolineras(arrayGasolineras);
-
-        return arrayGasolineras;
-      } catch (e) {
-        if ((e as Error).name !== "AbortError") setError("Error al cargar gasolineras");
-      } finally {
-        setCargando(false);
-      }
-      return[];
-    }
-
-    async function cargarGasolinerasMunicipio(municipioId: string, signal?: AbortSignal) {
-      setCargando(true);
-      try {
-        var arrayGasolineras = await cargarGasolinerasPorMunicipio(municipioId, signal); 
-
-        setGasolineras(arrayGasolineras);
-      } catch (e) {
-        if ((e as Error).name !== "AbortError") setError("Error al cargar gasolineras");
-      } finally {
-        setCargando(false);
-      }
-    }
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-color min-h-screen texto-color ">
@@ -133,58 +122,18 @@ export default function GasolineraPage() {
         ))}
       </select>*/}
 
-      <input
-        list="provincias-list"
-        value={provinciaNombre}
-        onChange={(e) => {
-          const nombre = e.target.value;
-          setProvinciaNombre(nombre);
-          const encontrada = provincias.find(p => p.Provincia === nombre);
-          setProvinciaId(encontrada ? encontrada.IDPovincia : "");
-        }}
-        placeholder="Escribe o selecciona una provincia"
-        className="w-full rounded-lg border border-gray-300 p-2 m-1"
+      <ComboboxProvincia
+        provincias={provincias}
+        provinciaId={provinciaId}
+        setProvinciaId={setProvinciaId}
       />
-      <datalist id="provincias-list">
-        {provincias.map((p) => (
-          <option key={p.IDPovincia} value={p.Provincia} />
-        ))}
-      </datalist>
 
       {provinciaId && (
-
-      <>
-        <input
-          list="municipios-list"
-          value={municipioNombre}
-          onChange={(e) => {
-            const nombre = e.target.value;
-            setMunicipioNombre(nombre);
-            const encontrada = arrayMunicipios.find(m => m.Municipio === nombre);
-            setMunicipioId(encontrada ? encontrada.IDMunicipio : "");
-          }}
-          placeholder="Escribe o selecciona un municipio"
-          className="w-full rounded-lg border border-gray-300 p-2 m-1"
+        <ComboboxMunicipio
+          municipios={arrayMunicipios}
+          municipioId={municipioId}
+          setMunicipioId={setMunicipioId}
         />
-        <datalist id="municipios-list">
-          {arrayMunicipios.map((m) => (
-            <option key={m.IDMunicipio} value={m.Municipio} />
-          ))}
-        </datalist>
-
-        {/*<select
-          value={municipioId}
-          onChange={(e) => setMunicipioId(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 p-2 m-1"
-        >
-          <option value="">Selecciona un municipio</option>
-          {arrayMunicipios.map((m) => (
-            <option key={m.IDMunicipio} value={m.IDMunicipio}>
-              {m.Municipio}
-            </option>
-          ))}
-        </select>*/}
-      </>
       )}
       
       {cargando && <p className="mt-4">Cargando los datos…</p>}
@@ -294,7 +243,7 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
           if (e.target.value === "") setProvinciaId("");
         }}
         onFocus={() => setAbierto(true)}
-        onBlur={() => setTimeout(() => setAbierto(false), 150)} // delay para permitir el click
+        onBlur={() => setTimeout(() => setAbierto(false), 150)} 
         placeholder="Escribe una provincia..."
         className="w-full rounded-lg border border-gray-300 p-2"
       />
@@ -307,6 +256,55 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
               className="p-2 hover:bg-gray-100 cursor-pointer"
             >
               {p.Provincia}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
+  municipios: Municipio[];
+  municipioId: string;
+  setMunicipioId: (id: string) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [abierto, setAbierto] = useState(false);
+
+  const filtradas = municipios.filter(m =>
+    m.Municipio.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const seleccionar = (m: Municipio) => {
+    setMunicipioId(m.IDMunicipio);
+    setQuery(m.Municipio);
+    setAbierto(false);
+  };
+
+  return (
+    <div className="relative w-full m-1">
+      <input
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setAbierto(true);
+          if (e.target.value === "") setMunicipioId("");
+        }}
+        onFocus={() => setAbierto(true)}
+        onBlur={() => setTimeout(() => setAbierto(false), 150)} 
+        placeholder="Escribe un municipio..."
+        className="w-full rounded-lg border border-gray-300 p-2"
+      />
+      {abierto && filtradas.length > 0 && (
+        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-auto">
+          {filtradas.map((m) => (
+            <li
+              key={m.IDMunicipio}
+              onClick={() => seleccionar(m)}
+              className="p-2 hover:bg-gray-100 cursor-pointer"
+            >
+              {m.Municipio}
             </li>
           ))}
         </ul>

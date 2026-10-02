@@ -1,26 +1,8 @@
 import { getGasolinerasPorProvincia, getGasolinerasPorMunicipio, getProvincias } from '@/app/api/routes';
-import { RespuestaGasolineras, Gasolinera, Provincia } from '@/types/gasolineras';
+import { Gasolinera } from '@/types/gasolineras';
+import {getInitial, getBrandColor, getGoogleMapsUrl} from '@/app/services/generalService';
 
-const BRAND_COLORS: Record<string, string> = {
-  repsol: "#E4032E",
-  cepsa: "#00529B",
-  galp: "#6E2585",
-  bp: "#00854A",
-  shell: "#FBCE07",
-  petronor: "#EF7D00",
-  avia: "#004B93",
-  q8: "#E30613",
-  campsa: "#003DA5",
-  esso: "#ED1C24",
-  carrefour: "#004E9E",
-  alcampo: "#E4032E",
-};
-
-const FALLBACK_PALETTE = [
-  "#0EA5A0", "#7C6FE0", "#E0748C", "#3B82C4", "#C2884A", "#5FA85A",
-];
-
-function cargarGasolineras(gasolineras:Gasolinera[]){
+function crearArrayGasolineras(gasolineras:Gasolinera[]){
   const arrayGasolineras : any[] = [];
 
   for(var gasolinera_ of gasolineras){
@@ -146,43 +128,14 @@ export async function cargarGasolinerasPorProvincia(provinciaId : string, signal
 
   var gasolineras = await getGasolinerasPorProvincia(provinciaId, signal);
 
- return cargarGasolineras(gasolineras);
+ return crearArrayGasolineras(gasolineras);
 }
 
 export async function cargarGasolinerasPorMunicipio(MunicipioId : string, signal?: AbortSignal){
 
   var gasolineras = await getGasolinerasPorMunicipio(MunicipioId, signal);
 
-  return cargarGasolineras(gasolineras);
+  return crearArrayGasolineras(gasolineras);
 }
 
-
-function getBrandColor(rotulo: string): string {
-  const normalized = rotulo.toLowerCase();
-  const known = Object.keys(BRAND_COLORS).find((brand) =>
-    normalized.includes(brand)
-  );
-  if (known) return BRAND_COLORS[known];
-  return FALLBACK_PALETTE[hashString(rotulo) % FALLBACK_PALETTE.length];
-}
-
-function getInitial(rotulo: string): string {
-  return rotulo.trim().charAt(0).toUpperCase() || "?";
-}
-
-function getGoogleMapsUrl(rotulo: string, direccion: string, localidad?: string): string {
-  var query = localidad ? rotulo+', '+direccion+', '+localidad : direccion;
-
-
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-}
-
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
 
