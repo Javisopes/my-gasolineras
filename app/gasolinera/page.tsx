@@ -146,7 +146,7 @@ export default function GasolineraPage() {
                 >
                   {g["Inicial"]}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 w-[85%]">
                   <div className="flex items-start justify-between max-w-full">
                       <h2 className="text-lg font-bold text-slate-900 leading-tight">{g["Rótulo"]}</h2>
                       <a style={{ color: g["Color"] }} href={g["Maps"]} target="_blank" rel="noopener noreferrer">
