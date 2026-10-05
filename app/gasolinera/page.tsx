@@ -13,7 +13,8 @@ export default function GasolineraPage() {
   const [arrayGasolineras, setGasolineras] = useState<Gasolinera[]>([]);
   const [municipioId, setMunicipioId] = useState("");
   const [municipioNombre, setMunicipioNombre] = useState("");
-  const [arrayMunicipios, setMunicipios] = useState<Municipio[]>([]); 
+  const [arrayMunicipios, setMunicipios] = useState<Municipio[]>([]);
+  const [recargarTriggerProvincia, setRecargarTriggerProvincia] = useState(0);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,7 +59,7 @@ export default function GasolineraPage() {
 
       return () => controller.abort();
 
-    }, [provinciaId]);
+    }, [provinciaId,recargarTriggerProvincia]);
 
     useEffect(() => {
 
@@ -68,9 +69,6 @@ export default function GasolineraPage() {
 
       const controller = new AbortController();
       setError(null);
-      console.log(municipioId);
-
-
 
       cargarGasolinerasDeMunicipio();
 
@@ -108,31 +106,29 @@ export default function GasolineraPage() {
           <span className="font-semibold">Minetur</span> (Ministerio de Industria, Energía y Turismo de España)
         </p>
       </div>
-      
-        {/*<select
-        value={provinciaId}
-        onChange={(e) => setProvinciaId(e.target.value)}
-        className="w-full rounded-lg border border-gray-300 p-2 m-1"
-      >
-        <option value="">Selecciona una provincia</option>
-        {provincias.map((p) => (
-          <option key={p.IDPovincia} value={p.IDPovincia}>
-            {p.Provincia}
-          </option>
-        ))}
-      </select>*/}
 
       <ComboboxProvincia
         provincias={provincias}
         provinciaId={provinciaId}
-        setProvinciaId={setProvinciaId}
+        setProvinciaId={(id) => {
+          setProvinciaId(id);
+          setMunicipioId("");
+          setMunicipioNombre("");
+          setMunicipios([]);
+          if(!id) setGasolineras([]);
+        }}
+
       />
 
       {provinciaId && (
         <ComboboxMunicipio
           municipios={arrayMunicipios}
           municipioId={municipioId}
-          setMunicipioId={setMunicipioId}
+          setMunicipioId={(id) => {
+            setMunicipioId(id);
+            setMunicipioNombre("");
+            if(!id) setRecargarTriggerProvincia(prev => prev + 1);
+          }}
         />
       )}
       
@@ -223,6 +219,10 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
   const [query, setQuery] = useState("");
   const [abierto, setAbierto] = useState(false);
 
+  useEffect(() => {
+    if (!provinciaId) setQuery("");
+  }, [provinciaId]);
+
   const filtradas = provincias.filter(p =>
     p.Provincia.toLowerCase().includes(query.toLowerCase())
   );
@@ -230,6 +230,12 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
   const seleccionar = (p: Provincia) => {
     setProvinciaId(p.IDPovincia);
     setQuery(p.Provincia);
+    setAbierto(false);
+  };
+
+  const limpiar = () => {
+    setQuery("");
+    setProvinciaId("");
     setAbierto(false);
   };
 
@@ -245,8 +251,21 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
         onFocus={() => setAbierto(true)}
         onBlur={() => setTimeout(() => setAbierto(false), 150)} 
         placeholder="Escribe una provincia..."
-        className="w-full rounded-lg border border-gray-300 p-2"
+        className="w-full rounded-lg border border-gray-600 p-2"
       />
+
+      {query && (
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={limpiar}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 text-2xl leading-none w-6 h-6 flex items-center justify-center"
+          aria-label="Limpiar selección"
+        >
+          ×
+        </button>
+      )}
+
       {abierto && filtradas.length > 0 && (
         <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-auto">
           {filtradas.map((p) => (
@@ -272,6 +291,11 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
   const [query, setQuery] = useState("");
   const [abierto, setAbierto] = useState(false);
 
+  useEffect(() => {
+    if (!municipioId) setQuery("");
+  }, [municipioId]);
+
+
   const filtradas = municipios.filter(m =>
     m.Municipio.toLowerCase().includes(query.toLowerCase())
   );
@@ -281,6 +305,12 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
     setQuery(m.Municipio);
     setAbierto(false);
   };
+
+    const limpiar = () => {
+      setQuery("");
+      setMunicipioId("");
+      setAbierto(false);
+    };
 
   return (
     <div className="relative w-full m-1">
@@ -294,8 +324,19 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
         onFocus={() => setAbierto(true)}
         onBlur={() => setTimeout(() => setAbierto(false), 150)} 
         placeholder="Escribe un municipio..."
-        className="w-full rounded-lg border border-gray-300 p-2"
+        className="w-full rounded-lg border border-gray-600 p-2"
       />
+      {query && (
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={limpiar}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 text-2xl leading-none w-6 h-6 flex items-center justify-center"
+          aria-label="Limpiar selección"
+        >
+          ×
+        </button>
+      )}
       {abierto && filtradas.length > 0 && (
         <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-auto">
           {filtradas.map((m) => (
