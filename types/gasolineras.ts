@@ -64,3 +64,9 @@ export interface Municipio {
   Municipio: string;
   Provincia: string;
 }
+
+export type Filtros = {
+    provincia: string;
+    municipio: string;
+    combustible: string;
+  };

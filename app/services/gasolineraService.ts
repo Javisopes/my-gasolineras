@@ -1,6 +1,7 @@
 import { getGasolinerasPorProvincia, getGasolinerasPorMunicipio, getProvincias } from '@/app/api/routes';
-import { Gasolinera } from '@/types/gasolineras';
+import { Gasolinera, Filtros } from '@/types/gasolineras';
 import {getInitial, getBrandColor, getGoogleMapsUrl} from '@/app/services/generalService';
+import { obtenerGasolinerasPorProvincia } from '@/app/services/cacheService';
 
 function crearArrayGasolineras(gasolineras:Gasolinera[]){
   const arrayGasolineras : any[] = [];
@@ -124,17 +125,22 @@ function crearArrayGasolineras(gasolineras:Gasolinera[]){
   return arrayGasolineras;
 }
 
-export async function cargarGasolinerasPorProvincia(provinciaId : string, signal?: AbortSignal){
+export async function cargarGasolinerasPorFiltros(filtros:Filtros, signal?: AbortSignal){
 
-  var gasolineras = await getGasolinerasPorProvincia(provinciaId, signal);
+  var arrayGasolinerasFiltradas = await obtenerGasolinerasPorProvincia(filtros.provincia, signal);
 
- return crearArrayGasolineras(gasolineras);
+  if (filtros.municipio) {
+    var municipioId = filtros.municipio;
+    arrayGasolinerasFiltradas = arrayGasolinerasFiltradas.filter(g =>
+      g.IDMunicipio.toLowerCase().includes(municipioId.toLowerCase())
+    );
+  }
+
+  return arrayGasolinerasFiltradas;
 }
 
-export async function cargarGasolinerasPorMunicipio(MunicipioId : string, signal?: AbortSignal){
-
-  var gasolineras = await getGasolinerasPorMunicipio(MunicipioId, signal);
-
+export async function cargarGasolinerasPorProvincia(provinciaId:string, signal?: AbortSignal){
+  var gasolineras = await getGasolinerasPorProvincia(provinciaId, signal);
   return crearArrayGasolineras(gasolineras);
 }
 

@@ -1,7 +1,7 @@
 import { Gasolinera, Municipio } from '@/types/gasolineras';
-import { getProvincias, getMunicipiosPorProvincia } from '@/app/api/routes';
+import { getMunicipiosPorProvincia } from '@/app/api/routes';
 
-    export async function cargarMunicipios(provinciaId: string, gasolineras: Gasolinera[], signal?: AbortSignal): Promise<Municipio[]> {
+    export async function cargarMunicipiosPorProvincia(provinciaId: string, gasolineras: Gasolinera[], signal?: AbortSignal): Promise<Municipio[]> {
 
       const municipiosConGasolinera = new Set(
         gasolineras.map(g => g.IDMunicipio)

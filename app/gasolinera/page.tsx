@@ -1,22 +1,24 @@
 "use client";
-import { getProvincias, getMunicipiosPorProvincia } from '@/app/api/routes';
-import { cargarGasolinerasPorProvincia, cargarGasolinerasPorMunicipio } from '@/app/services/gasolineraService';
-import { Gasolinera, Municipio, Provincia } from '@/types/gasolineras';
-import {cargarMunicipios} from '@/app/services/municipioService';
+import { getProvincias } from '@/app/api/routes';
+import { cargarGasolinerasPorFiltros } from '@/app/services/gasolineraService';
+import { Gasolinera, Municipio, Provincia, Filtros } from '@/types/gasolineras';
+import {cargarMunicipiosPorProvincia} from '@/app/services/municipioService';
 import React from 'react';
 import { useEffect, useState } from "react";
 
 export default function GasolineraPage() {
 
   const [provincias, setProvincias] = useState<Provincia[]>([]); // esto también cambia, ver abajo
-  const [provinciaId, setProvinciaId] = useState("");
   const [arrayGasolineras, setGasolineras] = useState<Gasolinera[]>([]);
-  const [municipioId, setMunicipioId] = useState("");
-  const [municipioNombre, setMunicipioNombre] = useState("");
   const [arrayMunicipios, setMunicipios] = useState<Municipio[]>([]);
   const [recargarTriggerProvincia, setRecargarTriggerProvincia] = useState(0);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filtros, setFiltros] = useState<Filtros>({
+    provincia: "",
+    municipio: "",
+    combustible: "",
+  });
 
     useEffect(() => {
       getProvincias().then(setProvincias);
@@ -24,31 +26,35 @@ export default function GasolineraPage() {
 
     useEffect(() => {
 
-      if (!provinciaId) {
+      if (!filtros.provincia) {
         return;
       }
+
+      var provinciaId = filtros.provincia;
 
       const controller = new AbortController();
       setError(null);
         
-      cargarMunicipiosYGasolineras();
+      cargarGasolineras();
 
-      async function cargarMunicipiosYGasolineras() {
+      async function cargarGasolineras() {
 
         try {
           setCargando(true);
 
-          var gasolinerasFiltradas = await cargarGasolinerasPorProvincia(provinciaId, controller.signal)
+          const gasolinerasFiltradas = await cargarGasolinerasPorFiltros(filtros,controller.signal);
           if(!gasolinerasFiltradas){
             setError('No se encontraron gasolineras');
           }
           setGasolineras(gasolinerasFiltradas);
 
-          var municipios = await cargarMunicipios(provinciaId, gasolinerasFiltradas, controller.signal);
-          if(!municipios){
-            setError('No se encontraron municipios');
+          if(!filtros.municipio){
+            var municipios = await cargarMunicipiosPorProvincia(provinciaId, gasolinerasFiltradas, controller.signal);
+            if(!municipios){
+              setError('No se encontraron municipios');
+            }
+            setMunicipios(municipios);
           }
-          setMunicipios(municipios);
 
           setCargando(false);
 
@@ -59,39 +65,7 @@ export default function GasolineraPage() {
 
       return () => controller.abort();
 
-    }, [provinciaId,recargarTriggerProvincia]);
-
-    useEffect(() => {
-
-      if (!municipioId) {
-        return;
-      }
-
-      const controller = new AbortController();
-      setError(null);
-
-      cargarGasolinerasDeMunicipio();
-
-      async function cargarGasolinerasDeMunicipio() {
-        try{
-          setCargando(true);
-
-          var arrayGasolineras = await cargarGasolinerasPorMunicipio(municipioId, controller.signal); 
-          if(!arrayGasolineras){
-            setError('No se encontraron gasolineras');
-          }
-          setGasolineras(arrayGasolineras);
-
-          setCargando(false);
-
-        } catch (e) {
-          if ((e as Error).name !== "AbortError") setError("Error durante la carga de datos");
-        }
-      }
-
-      return () => controller.abort();
-
-    }, [municipioId]);
+    }, [filtros,recargarTriggerProvincia]);
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-color min-h-screen texto-color ">
@@ -109,24 +83,23 @@ export default function GasolineraPage() {
 
       <ComboboxProvincia
         provincias={provincias}
-        provinciaId={provinciaId}
+        provinciaId={filtros.provincia}
         setProvinciaId={(id) => {
-          setProvinciaId(id);
-          setMunicipioId("");
-          setMunicipioNombre("");
+          setFiltros((prev) => ({ ...prev, ["provincia"]: id }));
+          setFiltros((prev) => ({ ...prev, ["municipio"]: "" }));
+          setFiltros((prev) => ({ ...prev, ["combustible"]: "" }));
           setMunicipios([]);
           if(!id) setGasolineras([]);
         }}
 
       />
 
-      {provinciaId && (
+      {filtros.provincia && (
         <ComboboxMunicipio
           municipios={arrayMunicipios}
-          municipioId={municipioId}
+          municipioId={filtros.municipio}
           setMunicipioId={(id) => {
-            setMunicipioId(id);
-            setMunicipioNombre("");
+            setFiltros((prev) => ({ ...prev, ["municipio"]: id }));
             if(!id) setRecargarTriggerProvincia(prev => prev + 1);
           }}
         />
