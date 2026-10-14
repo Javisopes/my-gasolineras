@@ -1,4 +1,4 @@
-import { getGasolinerasPorProvincia, getGasolinerasPorMunicipio, getProvincias } from '@/app/api/routes';
+import { getGasolinerasPorProvincia } from '@/app/api/routes';
 import { Gasolinera, Filtros } from '@/types/gasolineras';
 import {getInitial, getBrandColor, getGoogleMapsUrl} from '@/app/services/generalService';
 import { obtenerGasolinerasPorProvincia } from '@/app/services/cacheService';
@@ -50,74 +50,74 @@ function crearArrayGasolineras(gasolineras:Gasolinera[]){
     if(!gasolineraActual["Precios"]){
       gasolineraActual["Precios"] = {};
     }
-    if(!gasolineraActual["Precios"]["Precio Adblue"] && gasolinera["Precio Adblue"] != ""){
-      gasolineraActual["Precios"]["Precio Adblue"] = gasolinera["Precio Adblue"];
+    if(!gasolineraActual["Precios"]["Adblue"] && gasolinera["Precio Adblue"] != ""){
+      gasolineraActual["Precios"]["Adblue"] = gasolinera["Precio Adblue"];
     }
-    if(!gasolineraActual["Precios"]["Precio Amoniaco"] && gasolinera["Precio Amoniaco"] != ""){
-      gasolineraActual["Precios"]["Precio Amoniaco"] = gasolinera["Precio Amoniaco"];
+    if(!gasolineraActual["Precios"]["Amoniaco"] && gasolinera["Precio Amoniaco"] != ""){
+      gasolineraActual["Precios"]["Amoniaco"] = gasolinera["Precio Amoniaco"];
     }
-    if(!gasolineraActual["Precios"]["Precio Biodiesel"] && gasolinera["Precio Biodiesel"] != ""){
-      gasolineraActual["Precios"]["Precio Biodiesel"] = gasolinera["Precio Biodiesel"];
+    if(!gasolineraActual["Precios"]["Biodiesel"] && gasolinera["Precio Biodiesel"] != ""){
+      gasolineraActual["Precios"]["Biodiesel"] = gasolinera["Precio Biodiesel"];
     }
-    if(!gasolineraActual["Precios"]["Precio Bioetanol"] && gasolinera["Precio Bioetanol"] != ""){
-      gasolineraActual["Precios"]["Precio Bioetanol"] = gasolinera["Precio Bioetanol"];
+    if(!gasolineraActual["Precios"]["Bioetanol"] && gasolinera["Precio Bioetanol"] != ""){
+      gasolineraActual["Precios"]["Bioetanol"] = gasolinera["Precio Bioetanol"];
     }
-    if(!gasolineraActual["Precios"]["Precio Biogas Natural Comprimido"] && gasolinera["Precio Biogas Natural Comprimido"] != ""){
-      gasolineraActual["Precios"]["Precio Biogas Natural Comprimido"] = gasolinera["Precio Biogas Natural Comprimido"];
+    if(!gasolineraActual["Precios"]["Biogas Natural Comprimido"] && gasolinera["Precio Biogas Natural Comprimido"] != ""){
+      gasolineraActual["Precios"]["Biogas Natural Comprimido"] = gasolinera["Precio Biogas Natural Comprimido"];
     }
-    if(!gasolineraActual["Precios"]["Precio Biogas Natural Licuado"] && gasolinera["Precio Biogas Natural Licuado"] != ""){
-      gasolineraActual["Precios"]["Precio Biogas Natural Licuado"] = gasolinera["Precio Biogas Natural Licuado"];
+    if(!gasolineraActual["Precios"]["Biogas Natural Licuado"] && gasolinera["Precio Biogas Natural Licuado"] != ""){
+      gasolineraActual["Precios"]["Biogas Natural Licuado"] = gasolinera["Precio Biogas Natural Licuado"];
     }
-    if(!gasolineraActual["Precios"]["Precio Diésel Renovable"] && gasolinera["Precio Diésel Renovable"] != ""){
-      gasolineraActual["Precios"]["Precio Diésel Renovable"] = gasolinera["Precio Diésel Renovable"];
+    if(!gasolineraActual["Precios"]["Diésel Renovable"] && gasolinera["Precio Diésel Renovable"] != ""){
+      gasolineraActual["Precios"]["Diésel Renovable"] = gasolinera["Precio Diésel Renovable"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gas Natural Comprimido"] && gasolinera["Precio Gas Natural Comprimido"] != ""){
-      gasolineraActual["Precios"]["Precio Gas Natural Comprimido"] = gasolinera["Precio Gas Natural Comprimido"];
+    if(!gasolineraActual["Precios"]["Gas Natural Comprimido"] && gasolinera["Precio Gas Natural Comprimido"] != ""){
+      gasolineraActual["Precios"]["Gas Natural Comprimido"] = gasolinera["Precio Gas Natural Comprimido"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gas Natural Licuado"] && gasolinera["Precio Gas Natural Licuado"] != ""){
-      gasolineraActual["Precios"]["Precio Gas Natural Licuado"] = gasolinera["Precio Gas Natural Licuado"];
+    if(!gasolineraActual["Precios"]["Gas Natural Licuado"] && gasolinera["Precio Gas Natural Licuado"] != ""){
+      gasolineraActual["Precios"]["Gas Natural Licuado"] = gasolinera["Precio Gas Natural Licuado"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gases licuados del petróleo"] && gasolinera["Precio Gases licuados del petróleo"] != ""){
-      gasolineraActual["Precios"]["Precio Gases licuados del petróleo"] = gasolinera["Precio Gases licuados del petróleo"];
+    if(!gasolineraActual["Precios"]["Gases licuados del petróleo"] && gasolinera["Precio Gases licuados del petróleo"] != ""){
+      gasolineraActual["Precios"]["Gases licuados del petróleo"] = gasolinera["Precio Gases licuados del petróleo"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasoleo A"] && gasolinera["Precio Gasoleo A"] != ""){
-      gasolineraActual["Precios"]["Precio Gasoleo A"] = gasolinera["Precio Gasoleo A"];
+    if(!gasolineraActual["Precios"]["Gasoleo A"] && gasolinera["Precio Gasoleo A"] != ""){
+      gasolineraActual["Precios"]["Gasoleo A"] = gasolinera["Precio Gasoleo A"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasoleo B"] && gasolinera["Precio Gasoleo B"] != ""){
-      gasolineraActual["Precios"]["Precio Gasoleo B"] = gasolinera["Precio Gasoleo B"];
+    if(!gasolineraActual["Precios"]["Gasoleo B"] && gasolinera["Precio Gasoleo B"] != ""){
+      gasolineraActual["Precios"]["Gasoleo B"] = gasolinera["Precio Gasoleo B"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasoleo Premium"] && gasolinera["Precio Gasoleo Premium"] != ""){
-      gasolineraActual["Precios"]["Precio Gasoleo Premium"] = gasolinera["Precio Gasoleo Premium"];
+    if(!gasolineraActual["Precios"]["Gasoleo Premium"] && gasolinera["Precio Gasoleo Premium"] != ""){
+      gasolineraActual["Precios"]["Gasoleo Premium"] = gasolinera["Precio Gasoleo Premium"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasolina 95 E5"] && gasolinera["Precio Gasolina 95 E5"] != ""){
-      gasolineraActual["Precios"]["Precio Gasolina 95 E5"] = gasolinera["Precio Gasolina 95 E5"];
+    if(!gasolineraActual["Precios"]["Gasolina 95 E5"] && gasolinera["Precio Gasolina 95 E5"] != ""){
+      gasolineraActual["Precios"]["Gasolina 95 E5"] = gasolinera["Precio Gasolina 95 E5"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasolina 95 E5 Premium"] && gasolinera["Precio Gasolina 95 E5 Premium"] != ""){
-      gasolineraActual["Precios"]["Precio Gasolina 95 E5 Premium"] = gasolinera["Precio Gasolina 95 E5 Premium"];
+    if(!gasolineraActual["Precios"]["Gasolina 95 E5 Premium"] && gasolinera["Precio Gasolina 95 E5 Premium"] != ""){
+      gasolineraActual["Precios"]["Gasolina 95 E5 Premium"] = gasolinera["Precio Gasolina 95 E5 Premium"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasolina 95 E10"] && gasolinera["Precio Gasolina 95 E10"] != ""){
-      gasolineraActual["Precios"]["Precio Gasolina 95 E10"] = gasolinera["Precio Gasolina 95 E10"];
+    if(!gasolineraActual["Precios"]["Gasolina 95 E10"] && gasolinera["Precio Gasolina 95 E10"] != ""){
+      gasolineraActual["Precios"]["Gasolina 95 E10"] = gasolinera["Precio Gasolina 95 E10"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasolina 95 E25"] && gasolinera["Precio Gasolina 95 E25"] != ""){
-      gasolineraActual["Precios"]["Precio Gasolina 95 E25"] = gasolinera["Precio Gasolina 95 E25"];
+    if(!gasolineraActual["Precios"]["Gasolina 95 E25"] && gasolinera["Precio Gasolina 95 E25"] != ""){
+      gasolineraActual["Precios"]["Gasolina 95 E25"] = gasolinera["Precio Gasolina 95 E25"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasolina 95 E85"] && gasolinera["Precio Gasolina 95 E85"] != ""){
-      gasolineraActual["Precios"]["Precio Gasolina 95 E85"] = gasolinera["Precio Gasolina 95 E85"];
+    if(!gasolineraActual["Precios"]["Gasolina 95 E85"] && gasolinera["Precio Gasolina 95 E85"] != ""){
+      gasolineraActual["Precios"]["Gasolina 95 E85"] = gasolinera["Precio Gasolina 95 E85"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasolina 98 E5"] && gasolinera["Precio Gasolina 98 E5"] != ""){
-      gasolineraActual["Precios"]["Precio Gasolina 98 E5"] = gasolinera["Precio Gasolina 98 E5"];
+    if(!gasolineraActual["Precios"]["Gasolina 98 E5"] && gasolinera["Precio Gasolina 98 E5"] != ""){
+      gasolineraActual["Precios"]["Gasolina 98 E5"] = gasolinera["Precio Gasolina 98 E5"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasolina 98 E10"] && gasolinera["Precio Gasolina 98 E10"] != ""){
-      gasolineraActual["Precios"]["Precio Gasolina 98 E10"] = gasolinera["Precio Gasolina 98 E10"];
+    if(!gasolineraActual["Precios"]["Gasolina 98 E10"] && gasolinera["Precio Gasolina 98 E10"] != ""){
+      gasolineraActual["Precios"]["Gasolina 98 E10"] = gasolinera["Precio Gasolina 98 E10"];
     }
-    if(!gasolineraActual["Precios"]["Precio Gasolina Renovable"] && gasolinera["Precio Gasolina Renovable"] != ""){
-      gasolineraActual["Precios"]["Precio Gasolina Renovable"] = gasolinera["Precio Gasolina Renovable"];
+    if(!gasolineraActual["Precios"]["Gasolina Renovable"] && gasolinera["Precio Gasolina Renovable"] != ""){
+      gasolineraActual["Precios"]["Gasolina Renovable"] = gasolinera["Precio Gasolina Renovable"];
     }
-    if(!gasolineraActual["Precios"]["Precio Hidrogeno"] && gasolinera["Precio Hidrogeno"] != ""){
-      gasolineraActual["Precios"]["Precio Hidrogeno"] = gasolinera["Precio Hidrogeno"];
+    if(!gasolineraActual["Precios"]["Hidrogeno"] && gasolinera["Precio Hidrogeno"] != ""){
+      gasolineraActual["Precios"]["Hidrogeno"] = gasolinera["Precio Hidrogeno"];
     }
-    if(!gasolineraActual["Precios"]["Precio Metanol"] && gasolinera["Precio Metanol"] != ""){
-      gasolineraActual["Precios"]["Precio Metanol"] = gasolinera["Precio Metanol"];
+    if(!gasolineraActual["Precios"]["Metanol"] && gasolinera["Precio Metanol"] != ""){
+      gasolineraActual["Precios"]["Metanol"] = gasolinera["Precio Metanol"];
     }
     arrayGasolineras.push(gasolineraActual);
   }
@@ -136,6 +136,12 @@ export async function cargarGasolinerasPorFiltros(filtros:Filtros, signal?: Abor
     );
   }
 
+  if (filtros.combustible) {
+    arrayGasolinerasFiltradas = arrayGasolinerasFiltradas.filter(
+      g => g.Precios[filtros.combustible]
+    );
+  }
+
   return arrayGasolinerasFiltradas;
 }
 
@@ -143,5 +149,3 @@ export async function cargarGasolinerasPorProvincia(provinciaId:string, signal?:
   var gasolineras = await getGasolinerasPorProvincia(provinciaId, signal);
   return crearArrayGasolineras(gasolineras);
 }
-
-

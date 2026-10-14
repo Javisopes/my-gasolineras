@@ -1,8 +1,10 @@
 "use client";
 import { getProvincias } from '@/app/api/routes';
 import { cargarGasolinerasPorFiltros } from '@/app/services/gasolineraService';
-import { Gasolinera, Municipio, Provincia, Filtros } from '@/types/gasolineras';
+import { Gasolinera, Municipio, Provincia, Filtros, Combustible } from '@/types/gasolineras';
 import {cargarMunicipiosPorProvincia} from '@/app/services/municipioService';
+import {cargarCombustibles} from '@/app/services/combustibleService';
+
 import React from 'react';
 import { useEffect, useState } from "react";
 
@@ -11,6 +13,7 @@ export default function GasolineraPage() {
   const [provincias, setProvincias] = useState<Provincia[]>([]); // esto también cambia, ver abajo
   const [arrayGasolineras, setGasolineras] = useState<Gasolinera[]>([]);
   const [arrayMunicipios, setMunicipios] = useState<Municipio[]>([]);
+  const [arrayCombustibles, setCombustibles] = useState<any[]>([]);
   const [recargarTriggerProvincia, setRecargarTriggerProvincia] = useState(0);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,11 +45,10 @@ export default function GasolineraPage() {
         try {
           setCargando(true);
 
-          const gasolinerasFiltradas = await cargarGasolinerasPorFiltros(filtros,controller.signal);
+          var gasolinerasFiltradas = await cargarGasolinerasPorFiltros(filtros,controller.signal);
           if(!gasolinerasFiltradas){
             setError('No se encontraron gasolineras');
           }
-          setGasolineras(gasolinerasFiltradas);
 
           if(!filtros.municipio){
             var municipios = await cargarMunicipiosPorProvincia(provinciaId, gasolinerasFiltradas, controller.signal);
@@ -55,6 +57,17 @@ export default function GasolineraPage() {
             }
             setMunicipios(municipios);
           }
+
+          if(!filtros.combustible){
+            var combustibles = await cargarCombustibles(gasolinerasFiltradas, controller.signal);
+            if(!combustibles){
+              setError('No hay combustibles disponibles');
+            }
+            console.log(combustibles)
+            setCombustibles(Array.from(combustibles));
+          }
+
+          setGasolineras(gasolinerasFiltradas);
 
           setCargando(false);
 
@@ -95,15 +108,26 @@ export default function GasolineraPage() {
       />
 
       {filtros.provincia && (
-        <ComboboxMunicipio
-          municipios={arrayMunicipios}
-          municipioId={filtros.municipio}
-          setMunicipioId={(id) => {
-            setFiltros((prev) => ({ ...prev, ["municipio"]: id }));
-            if(!id) setRecargarTriggerProvincia(prev => prev + 1);
-          }}
-        />
+        <>
+          <ComboboxMunicipio
+            municipios={arrayMunicipios}
+            municipioId={filtros.municipio}
+            setMunicipioId={(id) => {
+              setFiltros((prev) => ({ ...prev, ["municipio"]: id }));
+            }}
+          />
+
+          <ComboboxCombustible
+            combustibles={arrayCombustibles}
+            combustibleId={filtros.combustible}
+            setCombustibleId={(id) => {
+              setFiltros((prev) => ({ ...prev, ["combustible"]: id }));
+            }}
+          />
+        </>
       )}
+
+      
       
       {cargando && <p className="mt-4">Cargando los datos…</p>}
       {error && <p className="mt-4 text-red-600">{error}</p>}
@@ -319,6 +343,77 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
               className="p-2 hover:bg-gray-100 cursor-pointer"
             >
               {m.Municipio}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function ComboboxCombustible({ combustibles, combustibleId, setCombustibleId }: {
+  combustibles: Combustible[];
+  combustibleId: string;
+  setCombustibleId: (id: string) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [abierto, setAbierto] = useState(false);
+
+  useEffect(() => {
+    if (!combustibleId) setQuery("");
+  }, [combustibleId]);
+
+
+  const filtradas = combustibles.filter(c =>
+    c.NombreProducto.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const seleccionar = (c: Combustible) => {
+    setCombustibleId(c.NombreProducto);
+    setQuery(c.NombreProducto);
+    setAbierto(false);
+  };
+
+    const limpiar = () => {
+      setQuery("");
+      setCombustibleId("");
+      setAbierto(false);
+    };
+
+  return (
+    <div className="relative w-full m-1">
+      <input
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setAbierto(true);
+          if (e.target.value === "") setCombustibleId("");
+        }}
+        onFocus={() => setAbierto(true)}
+        onBlur={() => setTimeout(() => setAbierto(false), 150)} 
+        placeholder="Escribe un tipo de combustible..."
+        className="w-full rounded-lg border border-gray-600 p-2"
+      />
+      {query && (
+        <button
+          type="button"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={limpiar}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 text-2xl leading-none w-6 h-6 flex items-center justify-center"
+          aria-label="Limpiar selección"
+        >
+          ×
+        </button>
+      )}
+      {abierto && filtradas.length > 0 && (
+        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-auto">
+          {filtradas.map((c) => (
+            <li
+              key={c.NombreProducto}
+              onClick={() => seleccionar(c)}
+              className="p-2 hover:bg-gray-100 cursor-pointer"
+            >
+              {c.NombreProducto}
             </li>
           ))}
         </ul>

@@ -70,3 +70,7 @@ export type Filtros = {
     municipio: string;
     combustible: string;
   };
+
+export interface Combustible {
+  NombreProducto: string;
+}
