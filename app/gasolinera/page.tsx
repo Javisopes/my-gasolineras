@@ -81,18 +81,8 @@ export default function GasolineraPage() {
     }, [filtros,recargarTriggerProvincia]);
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-color min-h-screen texto-color ">
-      <h1 className="text-2xl font-bold mb-2">Gasolineras</h1>
-
-      <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 text-gray-700 p-3 rounded-lg mb-3 text-sm">
-        <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-        </svg>
-        <p>
-          <span className="text-red-500 font-bold">*</span> Toda la información de la web proviene de{" "}
-          <span className="font-semibold">Minetur</span> (Ministerio de Industria, Energía y Turismo de España)
-        </p>
-      </div>
+    <div className="w-4xl mx-auto p-6 bg-color min-h-screen texto-color ">
+      <h1 className="text-2xl font-bold mb-2">Gasolineras APP</h1>
 
       <ComboboxProvincia
         provincias={provincias}
