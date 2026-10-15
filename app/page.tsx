@@ -14,7 +14,7 @@ export default function Home() {
             </svg>
             <p>
               <span className="text-red-500 font-bold">* </span>Ten en cuenta que los datos ofrecios por esta web provienen de{" "}
-              <span className="font-semibold">Minetur</span> (Ministerio de Industria, Energía y Turismo de España).
+              <span className="font-semibold">MITECO</span> (Ministerio para la Transición Ecológica y el Reto Demográfico).
             </p>
           </div>          
           <InicioButton/>
