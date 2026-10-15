@@ -1,9 +1,12 @@
 "use client";
+import {  } from '@/app/gasolinera/page.css';
 import { getProvincias } from '@/app/api/routes';
 import { cargarGasolinerasPorFiltros } from '@/app/services/gasolineraService';
 import { Gasolinera, Municipio, Provincia, Filtros, Combustible } from '@/types/gasolineras';
 import {cargarMunicipiosPorProvincia} from '@/app/services/municipioService';
 import {cargarCombustibles} from '@/app/services/combustibleService';
+import { IconAdjustmentsHorizontal } from "@tabler/icons-react";
+
 
 import React from 'react';
 import { useEffect, useState } from "react";
@@ -63,7 +66,6 @@ export default function GasolineraPage() {
             if(!combustibles){
               setError('No hay combustibles disponibles');
             }
-            console.log(combustibles)
             setCombustibles(Array.from(combustibles));
           }
 
@@ -84,38 +86,74 @@ export default function GasolineraPage() {
     <div className="w-4xl mx-auto p-6 bg-color min-h-screen texto-color ">
       <h1 className="text-2xl font-bold mb-2">Gasolineras APP</h1>
 
-      <ComboboxProvincia
-        provincias={provincias}
-        provinciaId={filtros.provincia}
-        setProvinciaId={(id) => {
-          setFiltros((prev) => ({ ...prev, ["provincia"]: id }));
-          setFiltros((prev) => ({ ...prev, ["municipio"]: "" }));
-          setFiltros((prev) => ({ ...prev, ["combustible"]: "" }));
-          setMunicipios([]);
-          if(!id) setGasolineras([]);
-        }}
+    <section className="filtros">
+      <header className="filtros__cabecera">
+        <span className="filtros__titulo">
+          <IconAdjustmentsHorizontal color="#c2410c" size={18} stroke={1.75} aria-hidden="true" />
+          Filtros
+        </span>
 
-      />
-
-      {filtros.provincia && (
-        <>
-          <ComboboxMunicipio
-            municipios={arrayMunicipios}
-            municipioId={filtros.municipio}
-            setMunicipioId={(id) => {
-              setFiltros((prev) => ({ ...prev, ["municipio"]: id }));
+          <button
+            type="button"
+            className="filtros__limpiar"
+            onClick={()=>{
+              setFiltros((prev) => ({
+                ...prev,
+                municipio: "",
+                combustible: ""
+              }));
             }}
-          />
+          >
+            Limpiar
+          </button>
 
-          <ComboboxCombustible
-            combustibles={arrayCombustibles}
-            combustibleId={filtros.combustible}
-            setCombustibleId={(id) => {
-              setFiltros((prev) => ({ ...prev, ["combustible"]: id }));
-            }}
-          />
-        </>
-      )}
+      </header>
+      <div className="filtros__cuerpo">
+        <label className="campo">
+        <span className="campo__etiqueta">Provincia</span>
+        <ComboboxProvincia
+          provincias={provincias}
+          provinciaId={filtros.provincia}
+          setProvinciaId={(id) => {
+            setFiltros((prev) => ({
+              ...prev,
+              provincia: id,
+              municipio: "",
+              combustible: ""
+            }));
+            setMunicipios([]);
+            if(!id) setGasolineras([]);
+          }}
+        />
+        </label>
+
+        {filtros.provincia && (
+          <>
+            <label className="campo">
+            <span className="campo__etiqueta">Municipio</span>
+            <ComboboxMunicipio
+              municipios={arrayMunicipios}
+              municipioId={filtros.municipio}
+              setMunicipioId={(id) => {
+                setFiltros((prev) => ({ ...prev, municipio: id }));
+              }}
+            />
+            </label>
+
+            <label className="campo">
+            <span className="campo__etiqueta">Combustible</span>
+            <ComboboxCombustible
+              combustibles={arrayCombustibles}
+              combustibleId={filtros.combustible}
+              setCombustibleId={(id) => {
+                setFiltros((prev) => ({ ...prev, combustible: id }));
+              }}
+            />
+            </label>
+          </>
+        )}
+      </div>
+    </section>
 
       
       
