@@ -84,7 +84,7 @@ export default function GasolineraPage() {
     }, [filtros,recargarTriggerProvincia]);
 
   return (
-    <div className="w-screen max-w-4xl mx-auto p-3 bg-color min-h-screen texto-color ">
+    <div className="w-screen max-w-4xl mx-auto p-5 bg-color min-h-screen texto-color ">
       <h1 className="text-2xl font-bold mb-2">Gasolineras APP</h1>
 
     <section className="filtros">
