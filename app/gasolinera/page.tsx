@@ -189,7 +189,8 @@ export default function GasolineraPage() {
                       className="text-xs font-medium px-2.5 py-1 rounded-full texto-color"
                       key={nombreCombustible} 
                       style={{ 
-                        backgroundColor: g["Color"]+"1A", 
+                        backgroundColor: g["Color"] ? g["Color"]+"1A" : "", 
+                        boxShadow: filtros.combustible === nombreCombustible && g["Color"] ? `0 0 0 2px ${g["Color"]}` : "none",
                         padding: "4px 8px", 
                         borderRadius: "4px", 
                         fontSize: "0.9em" 
@@ -342,7 +343,7 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
         }}
         onFocus={() => setAbierto(true)}
         onBlur={() => setTimeout(() => setAbierto(false), 150)} 
-        placeholder="Municipio..."
+        placeholder="Población..."
         className={`w-full rounded-lg border border-gray-600 p-2 ${query ? "pr-8" : ""}`}
       />
       {query && (
