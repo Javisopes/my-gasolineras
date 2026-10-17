@@ -55,6 +55,25 @@ body {
   color: var(--color-primary);
 }
 
+.campo-icono {
+  position: relative;
+}
+
+.campo-icono > svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  pointer-events: none;   /* para que el clic llegue al input */
+}
+
+.campo-icono input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 38px;     /* deja sitio al icono */
+}
+
 /*.first-color{
   background-color: #F2542D;
 }

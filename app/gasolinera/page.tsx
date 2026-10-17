@@ -6,6 +6,7 @@ import { Gasolinera, Municipio, Provincia, Filtros, Combustible } from '@/types/
 import {cargarMunicipiosPorProvincia} from '@/app/services/municipioService';
 import {cargarCombustibles} from '@/app/services/combustibleService';
 import { IconAdjustmentsHorizontal } from "@tabler/icons-react";
+import { IconMapPin, IconBuildingCommunity, IconGasStation } from "@tabler/icons-react";
 
 
 import React from 'react';
@@ -109,8 +110,6 @@ export default function GasolineraPage() {
 
       </header>
       <div className="filtros__cuerpo">
-        <label className="campo">
-        <span className="campo__etiqueta">Provincia</span>
         <ComboboxProvincia
           provincias={provincias}
           provinciaId={filtros.provincia}
@@ -125,12 +124,9 @@ export default function GasolineraPage() {
             if(!id) setGasolineras([]);
           }}
         />
-        </label>
 
         {filtros.provincia && (
           <>
-            <label className="campo">
-            <span className="campo__etiqueta">Municipio</span>
             <ComboboxMunicipio
               municipios={arrayMunicipios}
               municipioId={filtros.municipio}
@@ -138,10 +134,7 @@ export default function GasolineraPage() {
                 setFiltros((prev) => ({ ...prev, municipio: id }));
               }}
             />
-            </label>
 
-            <label className="campo">
-            <span className="campo__etiqueta">Combustible</span>
             <ComboboxCombustible
               combustibles={arrayCombustibles}
               combustibleId={filtros.combustible}
@@ -149,7 +142,6 @@ export default function GasolineraPage() {
                 setFiltros((prev) => ({ ...prev, combustible: id }));
               }}
             />
-            </label>
           </>
         )}
       </div>
@@ -265,7 +257,8 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
   };
 
   return (
-    <div className="relative w-full m-1">
+    <div className="relative w-full m-1 campo-icono">
+      <IconMapPin size={16} stroke={1.75} />
       <input
         value={query}
         onChange={(e) => {
@@ -338,7 +331,8 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
     };
 
   return (
-    <div className="relative w-full m-1">
+    <div className="relative w-full m-1 campo-icono">
+      <IconBuildingCommunity size={16} stroke={1.75} />
       <input
         value={query}
         onChange={(e) => {
@@ -409,7 +403,8 @@ function ComboboxCombustible({ combustibles, combustibleId, setCombustibleId }: 
     };
 
   return (
-    <div className="relative w-full m-1">
+    <div className="relative w-full m-1 campo-icono">
+      <IconGasStation size={16} stroke={1.75} />
       <input
         value={query}
         onChange={(e) => {
