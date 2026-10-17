@@ -84,19 +84,19 @@ export default function GasolineraPage() {
     }, [filtros,recargarTriggerProvincia]);
 
   return (
-    <div className="w-screen max-w-4xl mx-auto p-6 bg-color min-h-screen texto-color ">
+    <div className="w-screen max-w-4xl mx-auto p-3 bg-color min-h-screen texto-color ">
       <h1 className="text-2xl font-bold mb-2">Gasolineras APP</h1>
 
     <section className="filtros">
-      <header className="filtros__cabecera">
-        <span className="filtros__titulo">
+      <header className="filtros_cabecera">
+        <span className="filtros_titulo">
           <IconAdjustmentsHorizontal color="#c2410c" size={18} stroke={1.75} aria-hidden="true" />
           Filtros
         </span>
 
           <button
             type="button"
-            className="filtros__limpiar"
+            className="filtros_limpiar"
             onClick={()=>{
               setFiltros((prev) => ({
                 ...prev,
@@ -109,7 +109,7 @@ export default function GasolineraPage() {
           </button>
 
       </header>
-      <div className="filtros__cuerpo">
+      <div className="filtros_cuerpo">
         <ComboboxProvincia
           provincias={provincias}
           provinciaId={filtros.provincia}
@@ -126,7 +126,7 @@ export default function GasolineraPage() {
         />
 
         {filtros.provincia && (
-          <>
+          <div className="filtros_cuerpo_part">
             <ComboboxMunicipio
               municipios={arrayMunicipios}
               municipioId={filtros.municipio}
@@ -142,7 +142,7 @@ export default function GasolineraPage() {
                 setFiltros((prev) => ({ ...prev, combustible: id }));
               }}
             />
-          </>
+          </div>
         )}
       </div>
     </section>
@@ -257,7 +257,7 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
   };
 
   return (
-    <div className="relative w-full m-1 campo-icono">
+    <div className="relative w-full p-1 campo-icono">
       <IconMapPin size={16} stroke={1.75} />
       <input
         value={query}
@@ -269,7 +269,7 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
         onFocus={() => setAbierto(true)}
         onBlur={() => setTimeout(() => setAbierto(false), 150)} 
         placeholder="Escribe una provincia..."
-        className="w-full rounded-lg border border-gray-600 p-2"
+        className={`w-full rounded-lg border border-gray-600 p-2 ${query ? "pr-8" : ""}`}
       />
 
       {query && (
@@ -331,7 +331,7 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
     };
 
   return (
-    <div className="relative w-full m-1 campo-icono">
+    <div className="relative w-full p-1 campo-icono">
       <IconBuildingCommunity size={16} stroke={1.75} />
       <input
         value={query}
@@ -342,8 +342,8 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
         }}
         onFocus={() => setAbierto(true)}
         onBlur={() => setTimeout(() => setAbierto(false), 150)} 
-        placeholder="Escribe un municipio..."
-        className="w-full rounded-lg border border-gray-600 p-2"
+        placeholder="Municipio..."
+        className={`w-full rounded-lg border border-gray-600 p-2 ${query ? "pr-8" : ""}`}
       />
       {query && (
         <button
@@ -403,7 +403,7 @@ function ComboboxCombustible({ combustibles, combustibleId, setCombustibleId }: 
     };
 
   return (
-    <div className="relative w-full m-1 campo-icono">
+    <div className="relative w-full p-1 campo-icono">
       <IconGasStation size={16} stroke={1.75} />
       <input
         value={query}
@@ -414,8 +414,8 @@ function ComboboxCombustible({ combustibles, combustibleId, setCombustibleId }: 
         }}
         onFocus={() => setAbierto(true)}
         onBlur={() => setTimeout(() => setAbierto(false), 150)} 
-        placeholder="Escribe un tipo de combustible..."
-        className="w-full rounded-lg border border-gray-600 p-2"
+        placeholder="Combustible..."
+        className={`w-full rounded-lg border border-gray-600 p-2 ${query ? "pr-8" : ""}`}
       />
       {query && (
         <button
