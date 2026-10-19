@@ -136,10 +136,21 @@ export async function cargarGasolinerasPorFiltros(filtros:Filtros, signal?: Abor
     );
   }
 
-  if (filtros.combustible) {
+  if (!filtros.precioasc && filtros.combustible) {
     arrayGasolinerasFiltradas = arrayGasolinerasFiltradas.filter(
       g => g.Precios[filtros.combustible]
     );
+  }
+
+  if (filtros.precioasc && filtros.combustible) {
+    type Gasolinera = (typeof arrayGasolinerasFiltradas)[number];
+
+    const getPrecio = (g: Gasolinera): number =>
+      parseFloat(String(g.Precios?.[filtros.combustible]).replace(",", "."));
+
+    arrayGasolinerasFiltradas = arrayGasolinerasFiltradas
+      .filter((g) => !isNaN(getPrecio(g)))
+      .sort((a, b) => getPrecio(a) - getPrecio(b));
   }
 
   return arrayGasolinerasFiltradas;

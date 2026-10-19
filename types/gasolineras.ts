@@ -69,8 +69,16 @@ export type Filtros = {
     provincia: string;
     municipio: string;
     combustible: string;
+    precioasc: boolean;
   };
 
 export interface Combustible {
   NombreProducto: string;
 }
+
+export type FiltrosPrecio = {
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onChange?: (checked: boolean) => void;
+  disabled?: boolean;
+};

@@ -2,7 +2,7 @@
 import {  } from '@/app/gasolinera/page.css';
 import { getProvincias } from '@/app/api/routes';
 import { cargarGasolinerasPorFiltros } from '@/app/services/gasolineraService';
-import { Gasolinera, Municipio, Provincia, Filtros, Combustible } from '@/types/gasolineras';
+import { Gasolinera, Municipio, Provincia, Filtros, Combustible, FiltrosPrecio } from '@/types/gasolineras';
 import {cargarMunicipiosPorProvincia} from '@/app/services/municipioService';
 import {cargarCombustibles} from '@/app/services/combustibleService';
 import { IconAdjustmentsHorizontal } from "@tabler/icons-react";
@@ -25,7 +25,9 @@ export default function GasolineraPage() {
     provincia: "",
     municipio: "",
     combustible: "",
+    precioasc: false,
   });
+  const [enabledFiltroPrecio, setEnabledFiltroPrecio] = useState(false);
 
     useEffect(() => {
       getProvincias().then(setProvincias);
@@ -101,8 +103,10 @@ export default function GasolineraPage() {
               setFiltros((prev) => ({
                 ...prev,
                 municipio: "",
-                combustible: ""
+                combustible: "",
+                precioasc: true
               }));
+              setEnabledFiltroPrecio(true);
             }}
           >
             Limpiar
@@ -118,31 +122,46 @@ export default function GasolineraPage() {
               ...prev,
               provincia: id,
               municipio: "",
-              combustible: ""
+              combustible: "",
+              precioasc: true
             }));
+            setEnabledFiltroPrecio(true),
             setMunicipios([]);
             if(!id) setGasolineras([]);
           }}
         />
 
         {filtros.provincia && (
-          <div className="filtros_cuerpo_part">
-            <ComboboxMunicipio
-              municipios={arrayMunicipios}
-              municipioId={filtros.municipio}
-              setMunicipioId={(id) => {
-                setFiltros((prev) => ({ ...prev, municipio: id }));
-              }}
-            />
-
-            <ComboboxCombustible
-              combustibles={arrayCombustibles}
-              combustibleId={filtros.combustible}
-              setCombustibleId={(id) => {
-                setFiltros((prev) => ({ ...prev, combustible: id }));
-              }}
-            />
-          </div>
+          <>
+            <div className="filtros_cuerpo_part">
+              <ComboboxCombustible
+                combustibles={arrayCombustibles}
+                combustibleId={filtros.combustible}
+                setCombustibleId={(id) => {
+                  setFiltros((prev) => ({ ...prev, combustible: id, precioasc: true }));
+                }}
+              />
+              <ComboboxMunicipio
+                municipios={arrayMunicipios}
+                municipioId={filtros.municipio}
+                setMunicipioId={(id) => {
+                  setFiltros((prev) => ({ ...prev, municipio: id }));
+                }}
+              />
+            </div>
+            {filtros.combustible && (
+            <div className="flex items-center justify-start gap-4 p-3">
+              <FiltroPrecio checked={enabledFiltroPrecio} onChange={(enabled)=> {
+                setEnabledFiltroPrecio(enabled),
+                setFiltros((prev) => ({ ...prev, precioasc: enabled }));
+              }
+              } />
+              <span className="text-sm font-medium">
+                Ordenar por precios
+              </span>
+            </div>
+            )}
+          </>
         )}
       </div>
     </section>
@@ -176,7 +195,7 @@ export default function GasolineraPage() {
                   </div>
                   <p className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 w-fit max-w-full mb-4">
                     <PinIcon className="w-3.5 h-3.5 shrink-0" style={{ color: g["Color"] }} />
-                    <span className="font-medium texto-color"><strong>{g.Localidad} - {g["Dirección"]}</strong></span>
+                    <span className="font-medium texto-color"><strong>{g.Localidad}</strong> - {g["Dirección"]}</span>
                   </p>
 
                 </div>
@@ -443,5 +462,47 @@ function ComboboxCombustible({ combustibles, combustibleId, setCombustibleId }: 
         </ul>
       )}
     </div>
+  );
+}
+
+export function FiltroPrecio({
+  checked,
+  defaultChecked = true,
+  onChange,
+  disabled = false,
+}: FiltrosPrecio) {
+  // Funciona tanto controlado (prop `checked`) como no controlado.
+  const [internal, setInternal] = useState(defaultChecked);
+  const isOn = checked ?? internal;
+ 
+  const handleClick = () => {
+    if (disabled){
+      return;
+    } 
+    const next = !isOn;
+    if (checked === undefined) setInternal(next);
+    onChange?.(next);
+  };
+ 
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={isOn}
+      disabled={disabled}
+      onClick={handleClick}
+      className="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full
+        transition-colors duration-200 ease-in-out
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-500
+        disabled:cursor-not-allowed disabled:opacity-50"
+      style={{ backgroundColor: isOn ? "#c2410c" : "#D1D5DB" }}
+      
+    >
+      <span
+        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow
+          transition-transform duration-200 ease-in-out
+          ${isOn ? "translate-x-6" : "translate-x-1"}`}
+      />
+    </button>
   );
 }

@@ -29,13 +29,11 @@ function InicioButton() {
       <a
       href="./gasolinera"
       className="
-        rounded-xl bg-indigo-600 px-6 py-3
+        rounded-xl bg-[#c2410c] px-6 py-3
         font-semibold text-white shadow-lg
         transition-all duration-300
-        hover:scale-105 hover:bg-indigo-700
+        hover:scale-105
         active:scale-95
-        focus:outline-none focus:ring-4
-        focus:ring-indigo-300
       "
     >
       Acceder
