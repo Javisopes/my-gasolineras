@@ -31,10 +31,18 @@ export function getBrandColor(rotulo: string): string {
 }
 
 export function getGoogleMapsUrl(rotulo: string, direccion: string, localidad?: string): string {
-  var query = localidad ? rotulo+', '+direccion+', '+localidad : direccion;
+  const destino = localidad
+    ? `${rotulo}, ${direccion}, ${localidad}`
+    : `${rotulo}, ${direccion}`;
 
+  const params = new URLSearchParams({
+    api: "1",
+    destination: destino,
+    travelmode: "driving",
+    dir_action: "navigate",
+  });
 
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  return `https://www.google.com/maps/dir/?${params.toString()}`;
 }
 
 function hashString(str: string): number {
