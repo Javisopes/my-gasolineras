@@ -2,15 +2,15 @@
 import {  } from '@/app/gasolinera/page.css';
 import { getProvincias } from '@/app/api/routes';
 import { cargarGasolinerasPorFiltros } from '@/app/services/gasolineraService';
-import { Gasolinera, Municipio, Provincia, Filtros, Combustible, FiltrosPrecio } from '@/types/gasolineras';
+import { Gasolinera, Municipio, Provincia, Filtros, Combustible, OpcionesFiltro, PosiblesFiltros, FILTROS } from '@/types/gasolineras';
 import {cargarMunicipiosPorProvincia} from '@/app/services/municipioService';
 import {cargarCombustibles} from '@/app/services/combustibleService';
 import { IconAdjustmentsHorizontal } from "@tabler/icons-react";
-import { IconMapPin, IconBuildingCommunity, IconGasStation } from "@tabler/icons-react";
+import { IconMapPin, IconBuildingCommunity, IconGasStation, IconArrowsSort } from "@tabler/icons-react";
 
 
 import React from 'react';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId } from "react";
 
 export default function GasolineraPage() {
 
@@ -25,9 +25,15 @@ export default function GasolineraPage() {
     provincia: "",
     municipio: "",
     combustible: "",
-    precioasc: false,
+    orden:"alfabetico",
   });
-  const [enabledFiltroPrecio, setEnabledFiltroPrecio] = useState(false);
+  const ORDEN_POR_DEFECTO: PosiblesFiltros = "alfabetico";
+  const ORDEN_POR_PRECIO: PosiblesFiltros = "precio";
+  //const ORDEN_POR_PROXIMIDAD: PosiblesFiltros = "proximidad";
+
+  const actualizarFiltros = (cambios: Partial<Filtros>) => {
+    setFiltros((prev) => ({ ...prev, ...cambios }));
+  };
 
     useEffect(() => {
       getProvincias().then(setProvincias);
@@ -65,11 +71,18 @@ export default function GasolineraPage() {
           }
 
           if(!filtros.combustible){
+            if(filtros.orden === FILTROS.precio){
+              setError('Para filtrar por precio debes seleccionar un combustible antes');
+            }
             var combustibles = await cargarCombustibles(gasolinerasFiltradas, controller.signal);
             if(!combustibles){
               setError('No hay combustibles disponibles');
             }
             setCombustibles(Array.from(combustibles));
+          }
+
+          if(filtros.orden === FILTROS.proximidad){
+            setError('De momento aun no está disponible el filtro por proximidad');
           }
 
           setGasolineras(gasolinerasFiltradas);
@@ -100,13 +113,7 @@ export default function GasolineraPage() {
             type="button"
             className="filtros_limpiar"
             onClick={()=>{
-              setFiltros((prev) => ({
-                ...prev,
-                municipio: "",
-                combustible: "",
-                precioasc: true
-              }));
-              setEnabledFiltroPrecio(true);
+              actualizarFiltros({municipio: "", combustible: "", orden: ORDEN_POR_DEFECTO})
             }}
           >
             Limpiar
@@ -118,14 +125,7 @@ export default function GasolineraPage() {
           provincias={provincias}
           provinciaId={filtros.provincia}
           setProvinciaId={(id) => {
-            setFiltros((prev) => ({
-              ...prev,
-              provincia: id,
-              municipio: "",
-              combustible: "",
-              precioasc: true
-            }));
-            setEnabledFiltroPrecio(true),
+            actualizarFiltros({provincia: id, municipio: "", combustible: "", orden: ORDEN_POR_DEFECTO})
             setMunicipios([]);
             if(!id) setGasolineras([]);
           }}
@@ -138,29 +138,24 @@ export default function GasolineraPage() {
                 combustibles={arrayCombustibles}
                 combustibleId={filtros.combustible}
                 setCombustibleId={(id) => {
-                  setFiltros((prev) => ({ ...prev, combustible: id, precioasc: true }));
+                  if(!id){
+                    actualizarFiltros({combustible: id, orden: ORDEN_POR_DEFECTO})
+                  }else{
+                    actualizarFiltros({combustible: id, orden: ORDEN_POR_PRECIO})
+                  }
                 }}
               />
               <ComboboxMunicipio
                 municipios={arrayMunicipios}
                 municipioId={filtros.municipio}
                 setMunicipioId={(id) => {
-                  setFiltros((prev) => ({ ...prev, municipio: id }));
+                  actualizarFiltros({municipio: id})
                 }}
               />
             </div>
-            {filtros.combustible && (
-            <div className="flex items-center justify-start gap-4 p-3">
-              <FiltroPrecio checked={enabledFiltroPrecio} onChange={(enabled)=> {
-                setEnabledFiltroPrecio(enabled),
-                setFiltros((prev) => ({ ...prev, precioasc: enabled }));
-              }
-              } />
-              <span className="text-sm font-medium">
-                Ordenar por precios
-              </span>
+            <div className="p-1">
+              <OrdenFiltroChips value={filtros.orden} onChange={(ordenFiltro) => actualizarFiltros({orden: ordenFiltro})} />
             </div>
-            )}
           </>
         )}
       </div>
@@ -465,44 +460,53 @@ function ComboboxCombustible({ combustibles, combustibleId, setCombustibleId }: 
   );
 }
 
-export function FiltroPrecio({
-  checked,
-  defaultChecked = true,
-  onChange,
-  disabled = false,
-}: FiltrosPrecio) {
-  // Funciona tanto controlado (prop `checked`) como no controlado.
-  const [internal, setInternal] = useState(defaultChecked);
-  const isOn = checked ?? internal;
- 
-  const handleClick = () => {
-    if (disabled){
-      return;
-    } 
-    const next = !isOn;
-    if (checked === undefined) setInternal(next);
-    onChange?.(next);
+function OrdenFiltroChips({ value, onChange }: {
+  value: PosiblesFiltros;
+  onChange: (orden: PosiblesFiltros) => void;
+}) {
+  const seleccionar = (id: PosiblesFiltros) => {
+    onChange(id === value ? value : id);
   };
  
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={isOn}
-      disabled={disabled}
-      onClick={handleClick}
-      className="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full
-        transition-colors duration-200 ease-in-out
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-500
-        disabled:cursor-not-allowed disabled:opacity-50"
-      style={{ backgroundColor: isOn ? "#c2410c" : "#D1D5DB" }}
-      
-    >
-      <span
-        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow
-          transition-transform duration-200 ease-in-out
-          ${isOn ? "translate-x-6" : "translate-x-1"}`}
+    <div className="flex items-center gap-3 w-full rounded-lg p-2">
+      <IconArrowsSort
+        className="h-4 w-4 shrink-0 text-gray-500"
+        aria-hidden="true"
       />
-    </button>
+      <span id="orden-label" className="sr-only">
+        Ordenar por
+      </span>
+
+      <div
+        role="radiogroup"
+        aria-labelledby="orden-label"
+        title="Ordenar por"
+        className="flex flex-wrap gap-2"
+      >
+ 
+        <div role="radiogroup" aria-labelledby="orden-label" className="flex flex-wrap gap-2">
+          {OpcionesFiltro.map((of) => {
+            const activo = value === of.id;
+            return (
+              <button
+                key={of.id}
+                type="button"
+                role="radio"
+                aria-checked={activo}
+                onClick={() => seleccionar(of.id)}
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 ${
+                  activo
+                    ? "border-orange-700 bg-orange-700 text-white"
+                    : "border-gray-400 bg-white text-gray-800 hover:bg-gray-100"
+                }`}
+              >
+                {of.etiqueta}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }

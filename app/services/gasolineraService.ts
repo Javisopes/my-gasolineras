@@ -1,6 +1,6 @@
 import { getGasolinerasPorProvincia } from '@/app/api/routes';
-import { Gasolinera, Filtros } from '@/types/gasolineras';
-import {getInitial, getBrandColor, getGoogleMapsUrl} from '@/app/services/generalService';
+import { Gasolinera, Filtros, FILTROS } from '@/types/gasolineras';
+import {getInitial, getBrandColor, getGoogleMapsUrlByPosition, getGoogleMapsUrlByAddres} from '@/app/services/generalService';
 import { obtenerGasolinerasPorProvincia } from '@/app/services/cacheService';
 
 function crearArrayGasolineras(gasolineras:Gasolinera[]){
@@ -43,8 +43,18 @@ function crearArrayGasolineras(gasolineras:Gasolinera[]){
     if(!gasolineraActual["Horario"] && gasolinera["Horario"] != ""){
       gasolineraActual["Horario"] = gasolinera["Horario"];
     }
+    if(!gasolineraActual["Latitud"] && gasolinera["Latitud"] != ""){
+    gasolineraActual["Latitud"] = gasolinera["Latitud"];
+    }
+    if(!gasolineraActual["Longitud (WGS84)"] && gasolinera["Longitud (WGS84)"] != ""){
+      gasolineraActual["Longitud (WGS84)"] = gasolinera["Longitud (WGS84)"];
+    }
     if(!gasolineraActual["Maps"]){
-      gasolineraActual["Maps"] = getGoogleMapsUrl(rotulo, gasolinera["Dirección"], gasolinera["Localidad"]);
+      if(!gasolineraActual["Latitud"] && !gasolineraActual["Longitud (WGS84)"]){
+        gasolineraActual["Maps"] = getGoogleMapsUrlByPosition(gasolinera["Latitud"], gasolinera["Longitud (WGS84)"]);
+      }else{
+        gasolineraActual["Maps"] = getGoogleMapsUrlByAddres(rotulo, gasolinera["Dirección"], gasolinera["Localidad"]);
+      }
     }
 
     if(!gasolineraActual["Precios"]){
@@ -128,7 +138,7 @@ function crearArrayGasolineras(gasolineras:Gasolinera[]){
 export async function cargarGasolinerasPorFiltros(filtros:Filtros, signal?: AbortSignal){
 
   var arrayGasolinerasFiltradas = await obtenerGasolinerasPorProvincia(filtros.provincia, signal);
-
+console.log(filtros)
   if (filtros.municipio) {
     var municipioId = filtros.municipio;
     arrayGasolinerasFiltradas = arrayGasolinerasFiltradas.filter(g =>
@@ -136,21 +146,40 @@ export async function cargarGasolinerasPorFiltros(filtros:Filtros, signal?: Abor
     );
   }
 
-  if (!filtros.precioasc && filtros.combustible) {
+  if (filtros.combustible) {
     arrayGasolinerasFiltradas = arrayGasolinerasFiltradas.filter(
       g => g.Precios[filtros.combustible]
     );
   }
 
-  if (filtros.precioasc && filtros.combustible) {
-    type Gasolinera = (typeof arrayGasolinerasFiltradas)[number];
+  switch (filtros.orden) {
+    
+    case FILTROS.alfabetico:
+      arrayGasolinerasFiltradas = [...arrayGasolinerasFiltradas].sort((a, b) =>
+        a.IDMunicipio.localeCompare(b.IDMunicipio, "es", { sensitivity: "base" })
+      );
+      break;
 
-    const getPrecio = (g: Gasolinera): number =>
-      parseFloat(String(g.Precios?.[filtros.combustible]).replace(",", "."));
+    case FILTROS.precio:
+      if(!filtros.combustible){
+        break;
+      }
+      type Gasolinera = (typeof arrayGasolinerasFiltradas)[number];
 
-    arrayGasolinerasFiltradas = arrayGasolinerasFiltradas
-      .filter((g) => !isNaN(getPrecio(g)))
-      .sort((a, b) => getPrecio(a) - getPrecio(b));
+      const getPrecio = (g: Gasolinera): number =>
+        parseFloat(String(g.Precios?.[filtros.combustible]).replace(",", "."));
+
+      arrayGasolinerasFiltradas = arrayGasolinerasFiltradas
+        .filter((g) => !isNaN(getPrecio(g)))
+        .sort((a, b) => getPrecio(a) - getPrecio(b));
+
+      break;
+
+    case FILTROS.proximidad:
+      // ...
+      break;
+
+    default:break;
   }
 
   return arrayGasolinerasFiltradas;

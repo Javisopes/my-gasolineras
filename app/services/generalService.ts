@@ -30,7 +30,7 @@ export function getBrandColor(rotulo: string): string {
   return FALLBACK_PALETTE[hashString(rotulo) % FALLBACK_PALETTE.length];
 }
 
-export function getGoogleMapsUrl(rotulo: string, direccion: string, localidad?: string): string {
+export function getGoogleMapsUrlByAddres(rotulo: string, direccion: string, localidad?: string): string {
   const destino = localidad
     ? `${rotulo}, ${direccion}, ${localidad}`
     : `${rotulo}, ${direccion}`;
@@ -45,6 +45,19 @@ export function getGoogleMapsUrl(rotulo: string, direccion: string, localidad?: 
   return `https://www.google.com/maps/dir/?${params.toString()}`;
 }
 
+export function getGoogleMapsUrlByPosition(lat: string, lng: string,): string {
+  var nLat = aNumero(lat);
+  var nlng = aNumero(lng);
+
+  const params = new URLSearchParams({
+    api: "1",
+    destination: `${nLat},${nlng}`,
+    travelmode: "driving",
+    dir_action: "navigate",
+  });
+  return `https://www.google.com/maps/dir/?${params.toString()}`;
+}
+
 function hashString(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -52,4 +65,25 @@ function hashString(str: string): number {
     hash |= 0;
   }
   return Math.abs(hash);
+}
+
+export function aNumero(valor: string): number | null {
+  const limpio = valor?.trim();
+  if (!limpio) return null;
+  const n = parseFloat(limpio.replace(",", "."));
+  return Number.isNaN(n) ? null : n;
+};
+
+export function obtenerUbicacion(): Promise<{ lat: number; lng: number }> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Geolocalización no disponible"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      reject,
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  });
 }

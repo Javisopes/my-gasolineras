@@ -69,16 +69,23 @@ export type Filtros = {
     provincia: string;
     municipio: string;
     combustible: string;
-    precioasc: boolean;
+    orden:PosiblesFiltros;
   };
 
 export interface Combustible {
   NombreProducto: string;
 }
 
-export type FiltrosPrecio = {
-  checked?: boolean;
-  defaultChecked?: boolean;
-  onChange?: (checked: boolean) => void;
-  disabled?: boolean;
-};
+export const OpcionesFiltro:{ id: PosiblesFiltros; etiqueta: string }[] = [
+  { id: "alfabetico", etiqueta: "Orden A-Z" },
+  { id: "precio", etiqueta: "Más baratas" },
+  { id: "proximidad", etiqueta: "Más cercanas" },
+];
+
+export const FILTROS = {
+  alfabetico: "alfabetico",
+  precio: "precio",
+  proximidad: "proximidad",
+} as const;
+
+export type PosiblesFiltros = "alfabetico" | "precio" | "proximidad";
