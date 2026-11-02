@@ -81,10 +81,6 @@ export default function GasolineraPage() {
             setCombustibles(Array.from(combustibles));
           }
 
-          if(filtros.orden === FILTROS.proximidad){
-            setError('De momento aun no está disponible el filtro por proximidad');
-          }
-
           setGasolineras(gasolinerasFiltradas);
 
           setCargando(false);
@@ -178,19 +174,35 @@ export default function GasolineraPage() {
                   {g["Inicial"]}
                 </div>
                 <div className="min-w-0 w-[85%]">
-                  <div className="flex items-start justify-between max-w-full">
-                      <h2 className="text-lg font-bold text-slate-900 leading-tight">{g["Rótulo"]}</h2>
-                      <a style={{ color: g["Color"] }} href={g["Maps"]} target="_blank" rel="noopener noreferrer">
-                        Maps
+                  <div className="flex items-start justify-between max-w-full maps-info maps">
+                      <h2 className="text-lg font-bold text-slate-900 leading-tight">
+                        {g["Rótulo"]} 
+                        
+                        {g["proximidad"] != null && (
+                          <>
+                            {" · "}
+                            <span className="distancia first-color-text">
+                              
+                              {g["proximidad"].toLocaleString("es-ES", { maximumFractionDigits: 1 })} km
+                            </span>
+                          </>
+                        )}
+                      </h2>
+                      <a className="btn-maps" href={g["Maps"]} target="_blank" rel="noopener noreferrer">
+                        <strong>
+                          Maps
+                        </strong>
                       </a>
                   </div>
                   <div className="mt-3 flex items-center gap-1.5 text-xs px-2.5 py-1.5 w-fit max-w-full">
-                    <ClockIcon className="w-3.5 h-3.5 shrink-0" style={{ color: g["Color"] }} />
+                    <ClockIcon className="w-3.5 h-3.5 shrink-0 iconos-gaso" />
                     <span className="font-medium texto-color">{g["Horario"] || "No disponible"}</span>
                   </div>
-                  <p className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 w-fit max-w-full mb-4">
-                    <PinIcon className="w-3.5 h-3.5 shrink-0" style={{ color: g["Color"] }} />
-                    <span className="font-medium texto-color"><strong>{g.Localidad}</strong> - {g["Dirección"]}</span>
+                  <p className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 w-fit max-w-full">
+                    <PinIcon className="w-3.5 h-3.5 shrink-0 iconos-gaso" />
+                    <span className="font-medium texto-color">
+                      <strong>{g.Localidad}</strong> - {g["Dirección"]}
+                    </span>
                   </p>
 
                 </div>

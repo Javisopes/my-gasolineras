@@ -31,6 +31,10 @@ body {
   background-color: var(--color-primary);
 }
 
+.first-color-text{
+  color: var(--color-primary);
+}
+
 .secondary-color{
   background-color: #00A896;
 }
@@ -46,6 +50,16 @@ body {
 .texto-color{
   color:#141210;
 }
+
+.iconos-gaso{
+  color: #9ca3af
+}
+
+.maps{ 
+  color:#6b7280
+}
+
+/* #f3f4f6 */
 
 .border-first-color{
   border-color: var(--color-primary);

@@ -44,3 +44,24 @@
 .filtros_cuerpo_part {
   display: flex;
 }
+
+.distancia {
+  font-size: 0.85em;
+  opacity: 0.8; /* hereda el color de la marca, un poco más suave */
+}
+
+.btn-maps {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 999px;
+  padding: 3px 10px;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-maps:hover {
+  background: var(--color-primary);
+  color: #fff;
+}

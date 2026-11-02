@@ -1,6 +1,6 @@
 import { getGasolinerasPorProvincia } from '@/app/api/routes';
 import { Gasolinera, Filtros, FILTROS } from '@/types/gasolineras';
-import {getInitial, getBrandColor, getGoogleMapsUrlByPosition, getGoogleMapsUrlByAddres} from '@/app/services/generalService';
+import {getInitial, getBrandColor, getGoogleMapsUrlByPosition, getGoogleMapsUrlByAddres, obtenerUbicacion, aNumero, distanciaKm} from '@/app/services/generalService';
 import { obtenerGasolinerasPorProvincia } from '@/app/services/cacheService';
 
 function crearArrayGasolineras(gasolineras:Gasolinera[]){
@@ -44,10 +44,10 @@ function crearArrayGasolineras(gasolineras:Gasolinera[]){
       gasolineraActual["Horario"] = gasolinera["Horario"];
     }
     if(!gasolineraActual["Latitud"] && gasolinera["Latitud"] != ""){
-    gasolineraActual["Latitud"] = gasolinera["Latitud"];
+    gasolineraActual["Latitud"] = aNumero(gasolinera["Latitud"]);
     }
     if(!gasolineraActual["Longitud (WGS84)"] && gasolinera["Longitud (WGS84)"] != ""){
-      gasolineraActual["Longitud (WGS84)"] = gasolinera["Longitud (WGS84)"];
+      gasolineraActual["Longitud (WGS84)"] = aNumero(gasolinera["Longitud (WGS84)"]);
     }
     if(!gasolineraActual["Maps"]){
       if(!gasolineraActual["Latitud"] && !gasolineraActual["Longitud (WGS84)"]){
@@ -55,6 +55,10 @@ function crearArrayGasolineras(gasolineras:Gasolinera[]){
       }else{
         gasolineraActual["Maps"] = getGoogleMapsUrlByAddres(rotulo, gasolinera["Dirección"], gasolinera["Localidad"]);
       }
+    }
+
+    if(!gasolineraActual["proximidad"]){
+      gasolineraActual["proximidad"] = null;
     }
 
     if(!gasolineraActual["Precios"]){
@@ -176,9 +180,29 @@ console.log(filtros)
       break;
 
     case FILTROS.proximidad:
-      // ...
-      break;
+    
+      try {
+          var { myLat, myLng } = await obtenerUbicacion();
+          console.log(myLat, myLng);
 
+          arrayGasolinerasFiltradas.forEach(gasolineraActual => {
+            if(gasolineraActual["Latitud"] && gasolineraActual["Longitud (WGS84)"]){
+              gasolineraActual["proximidad"] = distanciaKm(myLat, myLng, gasolineraActual["Latitud"], gasolineraActual["Longitud (WGS84)"]);
+            }
+          });
+
+          arrayGasolinerasFiltradas = arrayGasolinerasFiltradas
+          .filter((g) => !isNaN(g["proximidad"]))
+          .sort((a, b) => a["proximidad"] - b["proximidad"]);
+
+      }catch (e) {
+        if ((e as Error).name !== "AbortError"){
+            throw new Error('Error al filtrar por proximidad');
+        }
+        return [];
+      }
+
+      break;
     default:break;
   }
 

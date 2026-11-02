@@ -46,12 +46,9 @@ export function getGoogleMapsUrlByAddres(rotulo: string, direccion: string, loca
 }
 
 export function getGoogleMapsUrlByPosition(lat: string, lng: string,): string {
-  var nLat = aNumero(lat);
-  var nlng = aNumero(lng);
-
   const params = new URLSearchParams({
     api: "1",
-    destination: `${nLat},${nlng}`,
+    destination: `${lat},${lng}`,
     travelmode: "driving",
     dir_action: "navigate",
   });
@@ -74,16 +71,33 @@ export function aNumero(valor: string): number | null {
   return Number.isNaN(n) ? null : n;
 };
 
-export function obtenerUbicacion(): Promise<{ lat: number; lng: number }> {
+export function obtenerUbicacion(): Promise<{ myLat: number; myLng: number }> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
       reject(new Error("Geolocalización no disponible"));
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      reject,
-      { enableHighAccuracy: true, timeout: 10000 }
+      (pos) => resolve({
+        myLat: pos.coords.latitude,
+        myLng: pos.coords.longitude,
+      }),
+      (err) => reject(err),
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
     );
   });
+}
+
+export function distanciaKm(lat1:number, lon1:number, lat2:number, lon2:number) {
+  const R = 6371; // radio de la Tierra en km
+  const toRad = (grados:number) => (grados * Math.PI) / 180;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
