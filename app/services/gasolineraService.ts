@@ -142,7 +142,7 @@ function crearArrayGasolineras(gasolineras:Gasolinera[]){
 export async function cargarGasolinerasPorFiltros(filtros:Filtros, signal?: AbortSignal){
 
   var arrayGasolinerasFiltradas = await obtenerGasolinerasPorProvincia(filtros.provincia, signal);
-console.log(filtros)
+
   if (filtros.municipio) {
     var municipioId = filtros.municipio;
     arrayGasolinerasFiltradas = arrayGasolinerasFiltradas.filter(g =>

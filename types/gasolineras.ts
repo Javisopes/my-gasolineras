@@ -77,7 +77,7 @@ export interface Combustible {
 }
 
 export const OpcionesFiltro:{ id: PosiblesFiltros; etiqueta: string }[] = [
-  { id: "alfabetico", etiqueta: "Orden A-Z" },
+  { id: "alfabetico", etiqueta: "Alfabético A-Z" },
   { id: "precio", etiqueta: "Más baratas" },
   { id: "proximidad", etiqueta: "Más cercanas" },
 ];
