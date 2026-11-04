@@ -4,8 +4,12 @@
   --background: #ffffff;
   --foreground: #171717;
   --color-primary: #c2410c;
-  --secondary-color: #00A896;
+  --secondary-color: #6b7280;
+  --bordes-color-1: #00A896;
 }
+
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @theme inline {
   --color-background: var(--background);
@@ -56,7 +60,7 @@ body {
 }
 
 .maps{ 
-  color:#6b7280
+  color: var(--secondary-color); 
 }
 
 /* #f3f4f6 */
@@ -73,13 +77,17 @@ body {
   position: relative;
 }
 
-.campo-icono > svg {
+.campo-icono svg {
   position: absolute;
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
+
   pointer-events: none;   /* para que el clic llegue al input */
+}
+
+.icono-color{
+  color: var(--color-primary);
 }
 
 .campo-icono input {

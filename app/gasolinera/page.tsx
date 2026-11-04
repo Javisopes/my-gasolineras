@@ -6,11 +6,11 @@ import { Gasolinera, Municipio, Provincia, Filtros, Combustible, OpcionesFiltro,
 import {cargarMunicipiosPorProvincia} from '@/app/services/municipioService';
 import {cargarCombustibles} from '@/app/services/combustibleService';
 import { IconAdjustmentsHorizontal } from "@tabler/icons-react";
-import { IconMapPin, IconBuildingCommunity, IconGasStation, IconArrowsSort } from "@tabler/icons-react";
+import { ArrowDownWideNarrow, Fuel, Building2, MapPin, ChevronDown, Check } from "lucide-react";
 
 
 import React from 'react';
-import { useEffect, useState, useId } from "react";
+import { useEffect, useState } from "react";
 
 export default function GasolineraPage() {
 
@@ -188,7 +188,7 @@ export default function GasolineraPage() {
                           </>
                         )}
                       </h2>
-                      <a className="btn-maps" href={g["Maps"]} target="_blank" rel="noopener noreferrer">
+                      <a className="filtros_limpiar" href={g["Maps"]} target="_blank" rel="noopener noreferrer">
                         <strong>
                           Maps
                         </strong>
@@ -285,7 +285,7 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
 
   return (
     <div className="relative w-full p-1 campo-icono">
-      <IconMapPin size={16} stroke={1.75} />
+      <MapPin size={16} className="icono-color"/>
       <input
         value={query}
         onChange={(e) => {
@@ -296,7 +296,8 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
         onFocus={() => setAbierto(true)}
         onBlur={() => setTimeout(() => setAbierto(false), 150)} 
         placeholder="Escribe una provincia..."
-        className={`w-full rounded-lg border border-gray-600 p-2 ${query ? "pr-8" : ""}`}
+        className={`w-full input-custom input-custom-with-X
+           ${query ? "pr-8" : ""}`}
       />
 
       {query && (
@@ -304,7 +305,7 @@ function ComboboxProvincia({ provincias, provinciaId, setProvinciaId }: {
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={limpiar}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 text-2xl leading-none w-6 h-6 flex items-center justify-center"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 text-2xl leading-none"
           aria-label="Limpiar selección"
         >
           ×
@@ -359,7 +360,7 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
 
   return (
     <div className="relative w-full p-1 campo-icono">
-      <IconBuildingCommunity size={16} stroke={1.75} />
+      <Building2 size={16} className="icono-color"/>
       <input
         value={query}
         onChange={(e) => {
@@ -370,14 +371,14 @@ function ComboboxMunicipio({ municipios, municipioId, setMunicipioId }: {
         onFocus={() => setAbierto(true)}
         onBlur={() => setTimeout(() => setAbierto(false), 150)} 
         placeholder="Población..."
-        className={`w-full rounded-lg border border-gray-600 p-2 ${query ? "pr-8" : ""}`}
+        className={`w-full input-custom input-custom-with-X ${query ? "pr-8" : ""}`}
       />
       {query && (
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={limpiar}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 text-2xl leading-none w-6 h-6 flex items-center justify-center"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 text-2xl leading-none"
           aria-label="Limpiar selección"
         >
           ×
@@ -431,7 +432,7 @@ function ComboboxCombustible({ combustibles, combustibleId, setCombustibleId }: 
 
   return (
     <div className="relative w-full p-1 campo-icono">
-      <IconGasStation size={16} stroke={1.75} />
+      <Fuel size={16} className="icono-color"/>
       <input
         value={query}
         onChange={(e) => {
@@ -442,14 +443,14 @@ function ComboboxCombustible({ combustibles, combustibleId, setCombustibleId }: 
         onFocus={() => setAbierto(true)}
         onBlur={() => setTimeout(() => setAbierto(false), 150)} 
         placeholder="Combustible..."
-        className={`w-full rounded-lg border border-gray-600 p-2 ${query ? "pr-8" : ""}`}
+        className={`w-full input-custom input-custom-with-X ${query ? "pr-8" : ""}`}
       />
       {query && (
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
           onClick={limpiar}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 text-2xl leading-none w-6 h-6 flex items-center justify-center"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800 text-2xl leading-none"
           aria-label="Limpiar selección"
         >
           ×
@@ -476,49 +477,81 @@ function OrdenFiltroChips({ value, onChange }: {
   value: PosiblesFiltros;
   onChange: (orden: PosiblesFiltros) => void;
 }) {
+
+  const [open, setOpen] = useState(true);
+  const [abierto, setAbierto] = useState(true);
+
+  const alternar = () => {
+  if (abierto) {
+    setAbierto(false);                     
+    setTimeout(() => setOpen(false), 200); 
+  } else {
+    setOpen(true);
+    setAbierto(true);
+  }
+};
+
   const seleccionar = (id: PosiblesFiltros) => {
     onChange(id === value ? value : id);
   };
  
   return (
-    <div className="flex items-center gap-3 w-full rounded-lg p-2">
-      <IconArrowsSort
-        className="h-4 w-4 shrink-0 text-gray-500"
-        aria-hidden="true"
-      />
-      <span id="orden-label" className="sr-only">
-        Ordenar por
-      </span>
+    <div className="gap-3 w-full rounded-lg">
 
-      <div
-        role="radiogroup"
-        aria-labelledby="orden-label"
-        title="Ordenar por"
-        className="flex flex-wrap gap-2"
+      <button
+        onClick={() => {alternar();}}  aria-expanded={abierto}
+        className="flex w-full justify-between
+          rounded-xl input-custom input-button-with-X "
       >
- 
-        <div role="radiogroup" aria-labelledby="orden-label" className="flex flex-wrap gap-2">
-          {OpcionesFiltro.map((of) => {
-            const activo = value === of.id;
-            return (
-              <button
-                key={of.id}
-                type="button"
-                role="radio"
-                aria-checked={activo}
-                onClick={() => seleccionar(of.id)}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 ${
-                  activo
-                    ? "border-orange-700 bg-orange-700 text-white"
-                    : "border-gray-400 bg-white text-gray-800 hover:bg-gray-100"
-                }`}
-              >
-                {of.etiqueta}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+        <span className="flex items-center gap-2">
+          <ArrowDownWideNarrow
+            size={16}
+            className="icono-color"
+          />
+          Ordenar por
+        </span>
+
+        <ChevronDown
+          size={17}
+          className={`transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <>
+    
+        <div role="radiogroup" aria-labelledby="orden-label" 
+              className={`flex flex-wrap gap-2 top-full
+          w-full rounded-xl border border-gray-100 bg-white p-2 shadow-xl 
+          ${
+            abierto
+              ? "animate-in fade-in zoom-in-95 slide-in-from-top-1"
+              : "animate-out fade-out zoom-out-95 slide-out-to-top-1  fill-mode-forwards"
+          }`}>
+            {OpcionesFiltro.map((of) => {
+              const activo = value === of.id;
+              return (
+                <button
+                  key={of.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={activo}
+                  onClick={() => {seleccionar(of.id)}}
+                  className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 ${
+                    activo
+                      ? "border-orange-700 bg-orange-700 text-white"
+                      : "border-gray-400 bg-white text-gray-800 hover:bg-gray-100"
+                  }`}
+                >
+                  {of.etiqueta}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }
