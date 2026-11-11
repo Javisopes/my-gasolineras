@@ -6,7 +6,35 @@ import { Gasolinera, Municipio, Provincia, Filtros, Combustible, OpcionesFiltro,
 import {cargarMunicipiosPorProvincia} from '@/app/services/municipioService';
 import {cargarCombustibles} from '@/app/services/combustibleService';
 import { IconAdjustmentsHorizontal } from "@tabler/icons-react";
-import { ArrowDownWideNarrow, Fuel, Building2, MapPin, ChevronDown, Check } from "lucide-react";
+import { ArrowDownWideNarrow, Fuel, Building2, MapPin, ChevronDown, Heart, Navigation } from "lucide-react";
+
+/*
+      <button
+        type="button"
+        onClick={() => onToggleFavorite(id)}
+        aria-label={
+          isFavorite
+            ? `Quitar ${name} de favoritos`
+            : `Añadir ${name} a favoritos`
+        }
+        aria-pressed={isFavorite}
+        className="shrink-0 rounded-lg p-1 text-slate-500
+                   transition-colors hover:bg-slate-100
+                   hover:text-rose-500
+                   focus-visible:outline-2
+                   focus-visible:outline-offset-2
+                   focus-visible:outline-blue-600"
+      >
+        <Heart
+          size={21}
+          className={
+            isFavorite
+              ? "fill-rose-500 text-rose-500"
+              : ""
+          }
+        />
+      </button>
+*/ 
 
 
 import React from 'react';
@@ -101,7 +129,7 @@ export default function GasolineraPage() {
     <section className="filtros">
       <header className="filtros_cabecera">
         <span className="filtros_titulo">
-          <IconAdjustmentsHorizontal color="#c2410c" size={18} stroke={1.75} aria-hidden="true" />
+          <IconAdjustmentsHorizontal className="icono-color" size={18} stroke={1.75} aria-hidden="true" />
           Filtros
         </span>
 
@@ -165,65 +193,60 @@ export default function GasolineraPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         {Object.values(arrayGasolineras).map((g: any) => (
           <React.Fragment key={g.id}>
-            <div key={g.id} className="bg-white rounded-xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-              <div className="flex items-start gap-3">
-                <div
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-semibold shrink-0"
-                  style={{ backgroundColor: g["Color"] }}
-                >
-                  {g["Inicial"]}
-                </div>
-                <div className="min-w-0 w-[85%]">
-                  <div className="flex items-start justify-between max-w-full maps-info maps">
-                      <h2 className="text-lg font-bold text-slate-900 leading-tight">
-                        {g["Rótulo"]} 
-                        
-                        {g["proximidad"] != null && (
-                          <>
-                            {" · "}
-                            <span className="distancia first-color-text">
-                              
-                              {g["proximidad"].toLocaleString("es-ES", { maximumFractionDigits: 1 })} km
-                            </span>
-                          </>
-                        )}
-                      </h2>
-                      <a className="filtros_limpiar" href={g["Maps"]} target="_blank" rel="noopener noreferrer">
-                        <strong>
-                          Maps
-                        </strong>
-                      </a>
-                  </div>
-                  <div className="mt-3 flex items-center gap-1.5 text-xs px-2.5 py-1.5 w-fit max-w-full">
-                    <ClockIcon className="w-3.5 h-3.5 shrink-0 iconos-gaso" />
-                    <span className="font-medium texto-color">{g["Horario"] || "No disponible"}</span>
-                  </div>
-                  <p className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 w-fit max-w-full">
-                    <PinIcon className="w-3.5 h-3.5 shrink-0 iconos-gaso" />
-                    <span className="font-medium texto-color">
-                      <strong>{g.Localidad}</strong> - {g["Dirección"]}
-                    </span>
-                  </p>
+            <div key={g.id} className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow overflow-hidden">
+              <div className="relative min-w-0 w-full p-3" style={{ 
+                        backgroundColor: g["Color"] ? g["Color"]+"1A" : "", 
+                        fontSize: "0.9em" 
+                      }}>
+                <div className="flex items-start justify-between w-full">
+                  <h2 className="min-w-0 text-lg font-bold text-slate-900 leading-tight">
+                    {g["Rótulo"]}
+                    <div className="h-0.5 w-full rounded-full"></div>
+                  </h2>
 
+                </div>
+                <div className="flex items-center gap-1.5 text-xs py-1 w-fit max-w-full">
+                  <span className="font-medium texto-color">
+                    <span>{g.Localidad}</span> - {g["Dirección"]}
+                  </span>
                 </div>
               </div>
+              
+              <div className="flex items-center gap-1.5 text-xs py-3 w-fit max-w-full px-2">
 
-              <div className="flex flex-wrap gap-2 mt-3">
+                <span className="flex items-center px-2.5 py-1 rounded-full texto-color ">
+                  <ClockIcon className="w-3.5 h-3.5 shrink-0 iconos-gaso" />
+                  <span className="font-medium texto-color px-2">{g["Horario"] || "No disponible"}</span>
+                </span>
+
+                {g["proximidad"] != null && (
+                  <span className="flex items-center px-2.5 py-1 rounded-full texto-color">
+                    <PinIcon className="w-3.5 h-3.5 shrink-0 iconos-gaso" />
+                    <span className="font-medium texto-color px-2">{g["proximidad"].toLocaleString("es-ES", { maximumFractionDigits: 1 })} km</span>
+                  </span>
+                )}
+
+                <a className="flex items-center px-2.5 py-1 rounded-full" href={g["Maps"]} target="_blank" rel="noopener noreferrer" style={{ borderBlockColor: g["Color"] }}>
+                  <Navigation className="w-3.5 h-3.5 shrink-0 iconos-gaso icono-color" />
+                  <strong className='text-black px-2 icono-color'>
+                    Cómo llegar
+                  </strong>
+                </a>
+
+              </div>
+              <hr className="border-t-2 border-gray-100 rounded mx-3" />
+              <div className="flex flex-wrap gap-2 px-3 py-4">
                 {g.Precios && Object.keys(g.Precios).length > 0 ? (
                   Object.entries(g.Precios).map(([nombreCombustible, valor]: [string, any]) => (
-                    <span 
-                      className="text-xs font-medium px-2.5 py-1 rounded-full texto-color"
+                    <div 
+                      className="text-xs font-medium px-2.5 py-1 rounded texto-color bg-gray-200 p-2 text-base"
                       key={nombreCombustible} 
                       style={{ 
-                        backgroundColor: g["Color"] ? g["Color"]+"1A" : "", 
                         boxShadow: filtros.combustible === nombreCombustible && g["Color"] ? `0 0 0 2px ${g["Color"]}` : "none",
-                        padding: "4px 8px", 
-                        borderRadius: "4px", 
-                        fontSize: "0.9em" 
                       }}
                     >
-                      {nombreCombustible} <strong>{valor} €/L</strong>
-                    </span>
+                      <div>{nombreCombustible} <strong>{valor} €/L</strong></div>
+                    </div>
                   ))
                 ) : (
                   <span style={{ color: "#999", fontSize: "0.9em" }}>Sin precios registrados</span>
