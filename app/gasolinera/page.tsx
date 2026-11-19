@@ -2,6 +2,7 @@
 import {  } from '@/app/gasolinera/page.css';
 import { getProvincias } from '@/app/api/routes';
 import { cargarGasolinerasPorFiltros } from '@/app/services/gasolineraService';
+import { actualizarFavoritos } from '@/app/services/generalService';
 import { Gasolinera, Municipio, Provincia, Filtros, Combustible, OpcionesFiltro, PosiblesFiltros, FILTROS } from '@/types/gasolineras';
 import {cargarMunicipiosPorProvincia} from '@/app/services/municipioService';
 import {cargarCombustibles} from '@/app/services/combustibleService';
@@ -47,6 +48,7 @@ export default function GasolineraPage() {
   const [arrayMunicipios, setMunicipios] = useState<Municipio[]>([]);
   const [arrayCombustibles, setCombustibles] = useState<any[]>([]);
   const [recargarTriggerProvincia, setRecargarTriggerProvincia] = useState(0);
+  const [favoritos, setFavoritos] = useState<string[]>([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filtros, setFiltros] = useState<Filtros>({
@@ -65,6 +67,15 @@ export default function GasolineraPage() {
 
     useEffect(() => {
       getProvincias().then(setProvincias);
+
+      const favoritosGuardados = localStorage.getItem("gasolineras-favoritas");
+      if (favoritosGuardados) {
+        try {
+          setFavoritos(JSON.parse(favoritosGuardados));
+        } catch (error) {
+          console.error("Error al cargar favoritos:", error);
+        }
+      }
     }, []);
 
     useEffect(() => {
@@ -121,6 +132,10 @@ export default function GasolineraPage() {
       return () => controller.abort();
 
     }, [filtros,recargarTriggerProvincia]);
+
+    const toggleFavorito = (id: string) => {
+      setFavoritos((prev) => actualizarFavoritos(id, prev));
+    };
 
   return (
     <div className="w-screen max-w-4xl mx-auto p-5 bg-color min-h-screen texto-color ">
@@ -203,7 +218,26 @@ export default function GasolineraPage() {
                     {g["Rótulo"]}
                     <div className="h-0.5 w-full rounded-full"></div>
                   </h2>
-
+                  <button
+                    type="button"
+                    onClick={() => toggleFavorito(String(g["id"]))}
+                    aria-label={
+                      favoritos.includes(String(g["id"]))
+                        ? "Quitar de favoritos"
+                        : "Añadir a favoritos"
+                    }
+                    aria-pressed={favoritos.includes(String(g["id"]))}
+                    className="shrink-0 self-start text-slate-500 hover:text-rose-500 transition-colors"
+                  >
+                    <Heart
+                      size={22}
+                      className={
+                        favoritos.includes(String(g["id"]))
+                          ? "fill-rose-500 text-rose-500"
+                          : "icono-color"
+                      }
+                    />
+                </button>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs py-1 w-fit max-w-full">
                   <span className="font-medium texto-color">

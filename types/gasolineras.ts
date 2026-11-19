@@ -80,12 +80,14 @@ export const OpcionesFiltro:{ id: PosiblesFiltros; etiqueta: string }[] = [
   { id: "alfabetico", etiqueta: "Alfabético A-Z" },
   { id: "precio", etiqueta: "Más baratas" },
   { id: "proximidad", etiqueta: "Más cercanas" },
+  { id: "favoritos", etiqueta: "Mis favoritos" },
 ];
 
 export const FILTROS = {
   alfabetico: "alfabetico",
   precio: "precio",
   proximidad: "proximidad",
+  favoritos: "favoritos"
 } as const;
 
-export type PosiblesFiltros = "alfabetico" | "precio" | "proximidad";
+export type PosiblesFiltros = "alfabetico" | "precio" | "proximidad" | "favoritos";

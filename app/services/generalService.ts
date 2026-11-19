@@ -101,3 +101,17 @@ export function distanciaKm(lat1:number, lon1:number, lat2:number, lon2:number) 
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
+  export function actualizarFavoritos(id:string, prev:string[]):string[]{
+
+    var actualizados = prev.includes(id)
+      ? prev.filter((fav) => fav !== id)
+      : [...prev, id];
+
+    localStorage.setItem(
+      "gasolineras-favoritas",
+      JSON.stringify(actualizados)
+    );
+    return actualizados;
+
+  }

@@ -183,7 +183,6 @@ export async function cargarGasolinerasPorFiltros(filtros:Filtros, signal?: Abor
     
       try {
           var { myLat, myLng } = await obtenerUbicacion();
-          console.log(myLat, myLng);
 
           arrayGasolinerasFiltradas.forEach(gasolineraActual => {
             if(gasolineraActual["Latitud"] && gasolineraActual["Longitud (WGS84)"]){
@@ -198,6 +197,28 @@ export async function cargarGasolinerasPorFiltros(filtros:Filtros, signal?: Abor
       }catch (e) {
         if ((e as Error).name !== "AbortError"){
             throw new Error('Error al filtrar por proximidad');
+        }
+        return [];
+      }
+
+      break;
+
+    case FILTROS.favoritos:
+      try {
+
+        var favs: string[] = JSON.parse(
+          localStorage.getItem("gasolineras-favoritas") || "[]"
+        );
+
+        if (favs.length > 0) {
+          arrayGasolinerasFiltradas = arrayGasolinerasFiltradas.filter(g =>
+            favs.includes(String(g.id))
+          );
+        }
+
+      }catch (e) {
+        if ((e as Error).name !== "AbortError"){
+            throw new Error('Error al filtrar por favoritos');
         }
         return [];
       }
